@@ -1,0 +1,33 @@
+# Maven & Java
+backend/target/
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+
+# Node & Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database & temp
+*.mv.db
+*.trace.db
+*.db
+*.log
+
+# IDE & Editor files
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# OS files
+Thumbs.db
+.DS_Store

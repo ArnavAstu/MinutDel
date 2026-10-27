@@ -1,0 +1,24 @@
+# AWS Production Profile (Activated with --spring.profiles.active=aws)
+spring:
+  datasource:
+    url: ${RDS_JDBC_URL:jdbc:postgresql://your-rds-endpoint.amazonaws.com:5432/minutdeldb}
+    driverClassName: org.postgresql.Driver
+    username: ${RDS_USERNAME:postgres}
+    password: ${RDS_PASSWORD:postgres123}
+  
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  
+  h2:
+    console:
+      enabled: false
+
+aws:
+  region: ${AWS_REGION:ap-south-1}
+  s3:
+    bucket-name: ${AWS_S3_BUCKET:minutdel-product-assets}
+    access-key: ${AWS_ACCESS_KEY_ID:}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:}
+    enabled: true

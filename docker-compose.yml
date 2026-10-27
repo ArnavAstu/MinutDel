@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # Spring Boot Backend (Can run standalone with H2, or connected to PostgreSQL)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: minutdel-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+    restart: unless-stopped
+
+  # Optional local PostgreSQL (Emulates Amazon RDS locally if desired)
+  postgres:
+    image: postgres:16-alpine
+    container_name: minutdel-postgres
+    environment:
+      POSTGRES_DB: minutdeldb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    profiles:
+      - with-db
+
+volumes:
+  pgdata:

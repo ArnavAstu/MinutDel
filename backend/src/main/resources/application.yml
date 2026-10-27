@@ -1,0 +1,48 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: MinutDel
+  
+  # Default Local Profile: Embedded H2 Database
+  datasource:
+    url: jdbc:h2:mem:minutdeldb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+# AWS Configuration (Local fallback enabled if keys are blank)
+aws:
+  region: ap-south-1
+  s3:
+    bucket-name: minutdel-product-assets
+    access-key: ""
+    secret-key: ""
+    enabled: false  # Set to true when deploying with AWS S3 credentials
+
+# Actuator & Observability for Cloud Metrics
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
