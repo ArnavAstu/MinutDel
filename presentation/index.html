@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MinutDel — Cloud Computing Project Presentation</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts Inter & Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"Fira Code"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              yellow: '#F8CB46',
+              green: '#0C831F',
+              darkgreen: '#085C15',
+              dark: '#0B0F19',
+              card: '#131B2E',
+              border: '#1E293B',
+              accent: '#38BDF8',
+              aws: '#FF9900'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @media print {
+      body { background: #0B0F19 !important; color: white !important; }
+      .slide { page-break-after: always; height: 100vh; display: flex !important; }
+      .nav-controls { display: none !important; }
+    }
+    .slide {
+      display: none;
+    }
+    .slide.active {
+      display: flex;
+    }
+    .gradient-border {
+      background: linear-gradient(135deg, rgba(248, 203, 70, 0.3), rgba(12, 131, 31, 0.3), rgba(56, 189, 248, 0.3));
+    }
+  </style>
+</head>
+<body class="bg-brand-dark text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-brand-yellow selection:text-slate-900">
+
+  <!-- Top Progress Bar & Header -->
+  <header class="w-full border-b border-brand-border bg-brand-dark/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="h-1 bg-brand-border w-full">
+      <div id="progressBar" class="h-full bg-gradient-to-r from-brand-yellow via-brand-green to-brand-accent transition-all duration-300 w-1/10"></div>
+    </div>
+    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-brand-yellow flex items-center justify-center font-black text-slate-900 text-sm shadow-md">
+          ⚡
+        </div>
+        <div>
+          <span class="font-extrabold tracking-tight text-white text-base">Minut<span class="text-brand-green">Del</span></span>
+          <span class="text-[11px] text-slate-400 font-mono ml-2 border-l border-slate-700 pl-2">Cloud Computing Architecture Deck</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-xs font-mono text-slate-400">
+        <span class="hidden sm:inline bg-brand-card px-2.5 py-1 rounded border border-brand-border">AWS Free Tier</span>
+        <span id="slideCounter" class="text-brand-yellow font-bold">Slide 1 / 10</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Slide Deck Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-6 md:p-10 flex flex-col justify-center">
+
+    <!-- SLIDE 1: Title & Hero -->
+    <section class="slide active flex-col justify-center items-center text-center py-12 animate-in fade-in duration-300" data-slide="1">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-card border border-brand-border text-xs font-mono text-brand-yellow mb-6 shadow-inner">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        AWS Cloud Architecture &amp; Implementation Project
+      </div>
+      <h1 class="text-4xl md:text-6xl font-black text-white tracking-tight max-w-4xl leading-tight">
+        Minut<span class="text-brand-yellow">Del</span>: Scalable 10-Minute <br class="hidden md:block"/>
+        <span class="bg-gradient-to-r from-brand-yellow via-emerald-400 to-brand-accent bg-clip-text text-transparent">
+          Quick Commerce Cloud Platform
+        </span>
+      </h1>
+      <p class="text-slate-400 text-base md:text-lg max-w-2xl mt-5 font-medium leading-relaxed">
+        A full-stack, event-driven Quick Commerce simulation engineered with Spring Boot 3, React, and deployed on zero-cost AWS Free Tier infrastructure.
+      </p>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl w-full mt-10">
+        <div class="bg-brand-card/70 border border-brand-border p-4 rounded-2xl text-left">
+          <span class="text-xs text-slate-400 block font-mono">COMPUTE</span>
+          <span class="text-sm font-bold text-white mt-1 block">Amazon EC2 (t2.micro)</span>
+        </div>
+        <div class="bg-brand-card/70 border border-brand-border p-4 rounded-2xl text-left">
+          <span class="text-xs text-slate-400 block font-mono">OBJECT STORAGE</span>
+          <span class="text-sm font-bold text-white mt-1 block">Amazon S3 Bucket</span>
+        </div>
+        <div class="bg-brand-card/70 border border-brand-border p-4 rounded-2xl text-left">
+          <span class="text-xs text-slate-400 block font-mono">DATABASE</span>
+          <span class="text-sm font-bold text-white mt-1 block">Amazon RDS / H2 JPA</span>
+        </div>
+        <div class="bg-brand-card/70 border border-brand-border p-4 rounded-2xl text-left">
+          <span class="text-xs text-slate-400 block font-mono">MONITORING</span>
+          <span class="text-sm font-bold text-white mt-1 block">CloudWatch + Actuator</span>
+        </div>
+      </div>
+
+      <div class="mt-8 text-xs text-slate-500 font-mono">
+        Presenter: <strong class="text-slate-300">Arnav Astu</strong> &bull; GitHub: <strong class="text-brand-accent">github.com/ArnavAstu/MinutDel</strong>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: Problem Statement & Motivation -->
+    <section class="slide flex-col justify-center py-6" data-slide="2">
+      <div class="text-xs font-mono text-brand-yellow uppercase tracking-widest mb-2">01 / Motivation &amp; Context</div>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+        Why Quick Commerce Demands Cloud Computing
+      </h2>
+      <p class="text-slate-400 text-sm mt-1 mb-8 max-w-3xl">
+        Quick commerce platforms (Blinkit, Zepto, Instamart) cannot survive on traditional monolithic architectures due to extreme real-time constraints.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-brand-card border border-brand-border p-6 rounded-2xl relative overflow-hidden">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-brand-yellow flex items-center justify-center text-2xl mb-4">
+            ⚡
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Flash Demand Spikes</h3>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Traffic surges 10x–50x during meal times and monsoon showers. Rigid on-premise servers either crash under load or waste massive idle capital.
+          </p>
+        </div>
+
+        <div class="bg-brand-card border border-brand-border p-6 rounded-2xl relative overflow-hidden">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-brand-green flex items-center justify-center text-2xl mb-4">
+            ⏱️
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Sub-100ms Inventory Locking</h3>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Dark stores carry finite local inventory. Over-selling creates costly delivery cancellations, requiring high-throughput, ACID-compliant database locking.
+          </p>
+        </div>
+
+        <div class="bg-brand-card border border-brand-border p-6 rounded-2xl relative overflow-hidden">
+          <div class="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center text-2xl mb-4">
+            📦
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Decoupled Media &amp; Compute</h3>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Serving high-resolution grocery imagery directly from backend application servers quickly starves thread pools. Offloading media to Cloud Object Storage is essential.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-6 p-4 rounded-xl bg-slate-900/60 border border-brand-border flex items-center gap-3 text-xs text-slate-300">
+        <span class="text-brand-yellow font-bold font-mono">KEY INSIGHT:</span>
+        Cloud computing allows quick commerce apps to decouple compute (EC2), object storage (S3), and transaction state (RDS) into distinct, independently scalable tiers.
+      </div>
+    </section>
+
+    <!-- SLIDE 3: Architecture Blueprint -->
+    <section class="slide flex-col justify-center py-6" data-slide="3">
+      <div class="text-xs font-mono text-brand-yellow uppercase tracking-widest mb-2">02 / System Design</div>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+        High-Level Cloud Architecture Blueprint
+      </h2>
+      <p class="text-slate-400 text-sm mt-1 mb-6 max-w-3xl">
+        Decoupled 3-tier architecture adhering to 12-Factor Cloud Application methodology.
+      </p>
+
+      <div class="bg-brand-card border border-brand-border rounded-2xl p-6 md:p-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center items-center">
+          
+          <!-- Tier 1 -->
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+            <span class="text-[10px] font-mono text-brand-accent uppercase tracking-wider block">TIER 1 &bull; CLIENT / EDGE</span>
+            <div class="text-2xl">💻 📱</div>
+            <h4 class="font-bold text-white text-sm">React 18 SPA</h4>
+            <p class="text-[11px] text-slate-400">Vite + Tailwind CSS<br/>Client-side routing &amp; live polling</p>
+          </div>
+
+          <div class="text-brand-yellow font-mono text-sm hidden md:block">
+            HTTPS / REST &rarr;
+          </div>
+
+          <!-- Tier 2 -->
+          <div class="p-4 rounded-xl bg-slate-900 border border-brand-border space-y-2 ring-1 ring-brand-yellow/30">
+            <span class="text-[10px] font-mono text-brand-yellow uppercase tracking-wider block">TIER 2 &bull; COMPUTE</span>
+            <div class="text-2xl">⚙️</div>
+            <h4 class="font-bold text-white text-sm">Spring Boot 3 (EC2)</h4>
+            <p class="text-[11px] text-slate-400">REST Controller &bull; JPA Service<br/>Async Fulfillment State Engine</p>
+          </div>
+
+          <div class="text-emerald-400 font-mono text-sm hidden md:block">
+            AWS SDK &amp; JDBC &rarr;
+          </div>
+
+          <!-- Tier 3 -->
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-3 col-span-1 md:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+            <div class="p-3 bg-brand-card/80 rounded-lg border border-slate-800 text-left flex items-center gap-3">
+              <span class="text-2xl">🪣</span>
+              <div>
+                <span class="text-[10px] font-mono text-brand-aws uppercase block">OBJECT STORAGE</span>
+                <h5 class="text-xs font-bold text-white">Amazon S3</h5>
+                <p class="text-[11px] text-slate-400">Stores grocery catalog assets with AWS SDK v2 client</p>
+              </div>
+            </div>
+
+            <div class="p-3 bg-brand-card/80 rounded-lg border border-slate-800 text-left flex items-center gap-3">
+              <span class="text-2xl">🗄️</span>
+              <div>
+                <span class="text-[10px] font-mono text-indigo-400 uppercase block">PERSISTENCE TIER</span>
+                <h5 class="text-xs font-bold text-white">Amazon RDS / H2</h5>
+                <p class="text-[11px] text-slate-400">PostgreSQL managed database with connection pooling</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: AWS Free Tier Mapping -->
+    <section class="slide flex-col justify-center py-6" data-slide="4">
+      <div class="text-xs font-mono text-brand-yellow uppercase tracking-widest mb-2">03 / Cloud Infrastructure</div>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+        AWS Services &amp; Free Tier Mapping
+      </h2>
+      <p class="text-slate-400 text-sm mt-1 mb-6 max-w-3xl">
+        Every component is strictly architected to operate within the 100% Free Tier threshold with zero cloud billing risk.
+      </p>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs bg-brand-card border border-brand-border rounded-2xl overflow-hidden">
+          <thead class="bg-slate-900 text-slate-300 font-mono text-[11px] uppercase border-b border-brand-border">
+            <tr>
+              <th class="p-4">AWS Service</th>
+              <th class="p-4">Architectural Role</th>
+              <th class="p-4">Free Tier Allowance</th>
+              <th class="p-4">Cost Safety</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-brand-border/60 text-slate-300">
+            <tr>
+              <td class="p-4 font-bold text-white flex items-center gap-2">
+                <span class="text-brand-aws text-base">🖥️</span> Amazon EC2
+              </td>
+              <td class="p-4">Hosts Spring Boot backend container &amp; web API</td>
+              <td class="p-4 font-mono text-emerald-400">750 hrs/month (t2.micro / t3.micro)</td>
+              <td class="p-4"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-semibold">100% Free (12 Mo)</span></td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-white flex items-center gap-2">
+                <span class="text-brand-aws text-base">🪣</span> Amazon S3
+              </td>
+              <td class="p-4">Decoupled storage for high-res grocery product photos</td>
+              <td class="p-4 font-mono text-emerald-400">5 GB Standard, 20,000 GET requests</td>
+              <td class="p-4"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-semibold">100% Free (12 Mo)</span></td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-white flex items-center gap-2">
+                <span class="text-brand-aws text-base">🗄️</span> Amazon RDS
+              </td>
+              <td class="p-4">Managed relational database for orders, users &amp; stock</td>
+              <td class="p-4 font-mono text-emerald-400">750 hrs/month (db.t3.micro) + 20 GB SSD</td>
+              <td class="p-4"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-semibold">100% Free (12 Mo)</span></td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-white flex items-center gap-2">
+                <span class="text-brand-aws text-base">📊</span> CloudWatch
+              </td>
+              <td class="p-4">Log aggregation &amp; Actuator health monitoring</td>
+              <td class="p-4 font-mono text-emerald-400">5 GB Log Data &bull; 10 Alarms</td>
+              <td class="p-4"><span class="px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 font-semibold">Always Free</span></td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-white flex items-center gap-2">
+                <span class="text-brand-aws text-base">🔐</span> Parameter Store
+              </td>
+              <td class="p-4">Centralized zero-hardcode configuration &amp; credentials</td>
+              <td class="p-4 font-mono text-emerald-400">Standard Parameters (Unlimited)</td>
+              <td class="p-4"><span class="px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 font-semibold">Always Free</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: 10-Minute Simulated Delivery Lifecycle -->
+    <section class="slide flex-col justify-center py-6" data-slide="5">
+      <div class="text-xs font-mono text-brand-yellow uppercase tracking-widest mb-2">04 / Fulfillment Engine</div>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+        10-Minute Asynchronous Order State Machine
+      </h2>
+      <p class="text-slate-400 text-sm mt-1 mb-8 max-w-3xl">
+        In quick commerce, the checkout HTTP request cannot block while dark store operations occur. MinutDel implements an asynchronous state machine:
+      </p>
+
+      <div class="relative pl-6 space-y-6 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-brand-border">
+        
+        <div class="flex items-start gap-4">
+          <div class="w-6 h-6 rounded-full bg-brand-yellow text-slate-900 font-black text-xs flex items-center justify-center -ml-6 z-10">1</div>
+          <div class="bg-brand-card border border-brand-border p-3.5 rounded-xl flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm">PLACED (T + 0s)</h4>
+              <span class="text-[11px] font-mono text-slate-400">ETA: 10 mins</span>
+            </div>
+            <p class="text-slate-400 text-xs mt-1">Transaction written to DB, stock quantities decremented, simulation thread spawned via <code class="text-brand-accent">@Async</code>.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4">
+          <div class="w-6 h-6 rounded-full bg-emerald-500 text-white font-black text-xs flex items-center justify-center -ml-6 z-10">2</div>
+          <div class="bg-brand-card border border-brand-border p-3.5 rounded-xl flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm">PACKING (T + 5s)</h4>
+              <span class="text-[11px] font-mono text-slate-400">ETA: 8 mins</span>
+            </div>
+            <p class="text-slate-400 text-xs mt-1">Simulates Dark Store #07 picker assembling grocery items from micro-warehouse shelves.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4">
+          <div class="w-6 h-6 rounded-full bg-sky-500 text-white font-black text-xs flex items-center justify-center -ml-6 z-10">3</div>
+          <div class="bg-brand-card border border-brand-border p-3.5 rounded-xl flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm">RIDER_ASSIGNED (T + 11s)</h4>
+              <span class="text-[11px] font-mono text-slate-400">ETA: 6 mins</span>
+            </div>
+            <p class="text-slate-400 text-xs mt-1">Delivery partner allocated (e.g. Amit Sharma &bull; +91 98711-22334), ready for package handoff.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4">
+          <div class="w-6 h-6 rounded-full bg-amber-500 text-white font-black text-xs flex items-center justify-center -ml-6 z-10">4</div>
+          <div class="bg-brand-card border border-brand-border p-3.5 rounded-xl flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm">OUT_FOR_DELIVERY &rarr; DELIVERED (T + 17s &rarr; T + 25s)</h4>
+              <span class="text-[11px] font-mono text-emerald-400 font-bold">10 MIN GUARANTEE MET</span>
+            </div>
+            <p class="text-slate-400 text-xs mt-1">Last-mile dispatch simulation completed; real-time polling reflects instantaneous delivery completion.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SLIDE 6: Backend Engineering & Spring Boot -->
+    <section class="slide flex-col justify-center py-6" data-slide="6">
+      <div class="text-xs font-mono text-brand-yellow uppercase tracking-widest mb-2">05 / Backend Architecture</div>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+        Spring Boot 3 &amp; Dual-Profile Database Agility
+      </h2>
+      <p class="text-slate-400 text-sm mt-1 mb-6 max-w-3xl">
+        Designed for zero-lock-in: write once, test locally with zero dependencies, deploy directly to AWS.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div class="bg-brand-card border border-brand-border p-6 rounded-2xl space-y-4">
+          <div class="flex items-center justify-between border-b border-brand-border pb-3">
+            <h4 class="text-sm font-bold text-white">Local Profile (<code class="text-brand-yellow">local</code>)</h4>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400">ZERO SETUP</span>
+          </div>
+          <ul class="text-xs text-slate-300 space-y-2">
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400">&check;</span>
+              <span><strong>Embedded H2 Database:</strong> Spins up automatically in RAM. No local PostgreSQL or Docker install required.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400">&check;</span>
+              <span><strong>Automatic Seeding:</strong> <code class="text-slate-400">DataLoader.java</code> seeds 12 groceries + 5 categories on startup.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400">&check;</span>
+              <span><strong>H2 Web Console:</strong> Live table inspections at <code class="text-slate-400">/h2-console</code>.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="bg-brand-card border border-brand-border p-6 rounded-2xl space-y-4">
+          <div class="flex items-center justify-between border-b border-brand-border pb-3">
+            <h4 class="text-sm font-bold text-white">Production Profile (<code class="text-brand-accent">aws</code>)</h4>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400">CLOUD MANAGED</span>
+          </div>
+          <ul class="text-xs text-slate-300 space-y-2">
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400">&check;</span>
+              <span><strong>Amazon RDS PostgreSQL:</strong> Activated via <code class="text-brand-accent">--spring.profiles.active=aws</code>.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400">&check;</span>
+              <span><strong>Spring Data JPA Abstraction:</strong> Zero code changes to entities or queries between H2 and RDS.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400">&check;</span>
+              <span><strong>AWS SDK v2 S3 Integration:</strong> Transparently resolves image URLs from S3 buckets with fallback.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="mt-6 p-4 rounded-xl bg-slate-900 border border-brand-border text-xs font-mono text-slate-400">
+        <span class="text-slate-500">// Switching database requires changing only the JDBC connection URL:</span><br/>
+        <span class="text-brand-yellow">spring.datasource.url</span> = ${RDS_JDBC_URL:jdbc:postgresql://your-rds-endpoint.amazonaws.com:5432/minutdeldb}
+      </div>
+    </section>
+
+    <!-- SLIDE 7: Frontend & Real-time Telemetry -->
+    <section class="slide flex-col justify-center py-6" data-slide="7">
+      <div class="text-xs font-mono text-brand-yellow uppercase tracking-widest mb-2">06 / User Experience</div>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+        React Storefront &amp; Live Cloud Telemetry
+      </h2>
+      <p class="text-slate-400 text-sm mt-1 mb-6 max-w-3xl">
+        Designed with modern quick-commerce visual standards (Blinkit aesthetic) coupled with live cloud inspection.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl">
+          <div class="text-2xl mb-3">🛒</div>
+          <h4 class="font-bold text-white text-sm mb-1">Instant Cart Drawer</h4>
+          <p class="text-xs text-slate-400">
+            Persistent state management, real-time quantity steppers, dynamic bill calculation, and delivery address capture.
+          </p>
+        </div>
+
+        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl">
+          <div class="text-2xl mb-3">🚴</div>
+          <h4 class="font-bold text-white text-sm mb-1">Simulated Order Tracker</h4>
+          <p class="text-xs text-slate-400">
+            5-stage progress indicator polling <code class="text-brand-accent">/api/orders/{id}</code> every 2.5s, displaying active rider info and live countdown.
+          </p>
+        </div>
+
+        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl">
+          <div class="text-2xl mb-3">☁️</div>
+          <h4 class="font-bold text-white text-sm mb-1">Live Cloud Telemetry Modal</h4>
+          <p class="text-xs text-slate-400">
+            Interactive modal querying <code class="text-brand-accent">/api/cloud-info</code> to inspect active EC2 hostname, database dialect, and S3 bucket status.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-6 p-4 bg-brand-card/90 rounded-2xl border border-brand-border flex items-center justify-between text-xs">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+          <span class="text-slate-300 font-mono">Single-Artifact Deployment: Frontend build is embedded in Spring Boot's <code class="text-white">static/</code> folder.</span>
+        </div>
+        <span class="text-brand-yellow font-bold">Zero CORS Issues</span>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: Security & Cloud Best Practices -->
+    <section class="slide flex-col justify-center py-6" data-slide="8">
+      <div class="text-xs font-mono text-brand-yellow uppercase tracking-widest mb-2">07 / Security &amp; Networking</div>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+        AWS Security, Networking &amp; 12-Factor Compliance
+      </h2>
+      <p class="text-slate-400 text-sm mt-1 mb-6 max-w-3xl">
+        Production-grade cloud security and architecture guidelines demonstrated in this implementation.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div class="bg-brand-card border border-brand-border p-6 rounded-2xl space-y-3">
+          <h4 class="font-bold text-white text-sm flex items-center gap-2">
+            <span class="text-brand-aws">🛡️</span> Security Groups (Virtual Firewall)
+          </h4>
+          <p class="text-xs text-slate-400">
+            Strict least-privilege ingress rules enforced at the AWS VPC edge:
+          </p>
+          <div class="space-y-1.5 font-mono text-[11px]">
+            <div class="p-2 bg-slate-900 rounded border border-slate-800 flex justify-between">
+              <span class="text-slate-300">Port 22 (SSH)</span>
+              <span class="text-amber-400">Restricted Admin Access</span>
+            </div>
+            <div class="p-2 bg-slate-900 rounded border border-slate-800 flex justify-between">
+              <span class="text-slate-300">Port 80 (HTTP)</span>
+              <span class="text-emerald-400">Public Inbound Web Traffic</span>
+            </div>
+            <div class="p-2 bg-slate-900 rounded border border-slate-800 flex justify-between">
+              <span class="text-slate-300">Port 8080 (Custom TCP)</span>
+              <span class="text-emerald-400">MinutDel Full-Stack App</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-brand-card border border-brand-border p-6 rounded-2xl space-y-3">
+          <h4 class="font-bold text-white text-sm flex items-center gap-2">
+            <span class="text-emerald-400">📐</span> 12-Factor Cloud Principles
+          </h4>
+          <div class="space-y-2 text-xs text-slate-300">
+            <div class="flex items-start gap-2">
+              <span class="text-brand-yellow font-bold">1.</span>
+              <span><strong>Stateless Compute:</strong> EC2 instances store no persistent data. Sessions &amp; transactions live in RDS / external storage.</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-brand-yellow font-bold">2.</span>
+              <span><strong>Externalized Config:</strong> Secrets, database credentials, and bucket names injected via environment variables.</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-brand-yellow font-bold">3.</span>
+              <span><strong>Port Binding:</strong> Self-contained HTTP listener (Tomcat embedded) exported on port 8080.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SLIDE 9: Deployment Workflow -->
+    <section class="slide flex-col justify-center py-6" data-slide="9">
+      <div class="text-xs font-mono text-brand-yellow uppercase tracking-widest mb-2">08 / DevOps &amp; CI/CD</div>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+        Zero-Friction Cloud Deployment Workflow
+      </h2>
+      <p class="text-slate-400 text-sm mt-1 mb-6 max-w-3xl">
+        How MinutDel transitions from local developer workstation to 24/7 public cloud execution in 3 steps:
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl space-y-3">
+          <div class="w-8 h-8 rounded-lg bg-brand-yellow/10 text-brand-yellow font-mono font-black flex items-center justify-center text-sm">
+            01
+          </div>
+          <h4 class="font-bold text-white text-sm">Code &amp; Version Control</h4>
+          <p class="text-xs text-slate-400">
+            Clean Git repository with rigorous <code class="text-slate-300">.gitignore</code> rules. Pushed to remote GitHub repository:
+          </p>
+          <div class="p-2 bg-slate-900 rounded font-mono text-[10px] text-brand-accent truncate">
+            github.com/ArnavAstu/MinutDel
+          </div>
+        </div>
+
+        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl space-y-3">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 font-mono font-black flex items-center justify-center text-sm">
+            02
+          </div>
+          <h4 class="font-bold text-white text-sm">EC2 Cloud Provisioning</h4>
+          <p class="text-xs text-slate-400">
+            Launch Ubuntu 24.04 instance. Pull code directly via Git, compile unified JAR artifact with Maven:
+          </p>
+          <div class="p-2 bg-slate-900 rounded font-mono text-[10px] text-emerald-400 truncate">
+            mvn clean package -DskipTests
+          </div>
+        </div>
+
+        <div class="bg-brand-card border border-brand-border p-5 rounded-2xl space-y-3">
+          <div class="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-400 font-mono font-black flex items-center justify-center text-sm">
+            03
+          </div>
+          <h4 class="font-bold text-white text-sm">Daemon Execution</h4>
+          <p class="text-xs text-slate-400">
+            Launch background daemon on EC2. Instantly accessible from any browser globally:
+          </p>
+          <div class="p-2 bg-slate-900 rounded font-mono text-[10px] text-sky-400 truncate">
+            http://&lt;EC2-PUBLIC-IP&gt;:8080
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-6 p-4 rounded-xl bg-slate-900 border border-brand-border text-xs text-slate-300 flex items-center gap-3">
+        <span class="text-xl">🐳</span>
+        <span><strong>Docker Ready:</strong> Multi-stage <code class="text-white">Dockerfile</code> included to build minimal Alpine-based containers if orchestrating via Amazon ECS or Kubernetes.</span>
+      </div>
+    </section>
+
+    <!-- SLIDE 10: Conclusion & Future Roadmap -->
+    <section class="slide flex-col justify-center py-6" data-slide="10">
+      <div class="text-xs font-mono text-brand-yellow uppercase tracking-widest mb-2">09 / Conclusion</div>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+        Conclusion &amp; Scalability Roadmap
+      </h2>
+      <p class="text-slate-400 text-sm mt-1 mb-8 max-w-3xl">
+        MinutDel validates that modern, high-performance quick-commerce architectures can be rapidly prototyped and deployed under AWS Free Tier.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div class="bg-brand-card border border-brand-border p-6 rounded-2xl space-y-3">
+          <h4 class="font-bold text-emerald-400 text-sm flex items-center gap-2">
+            <span>🏆</span> What We Accomplished
+          </h4>
+          <ul class="text-xs text-slate-300 space-y-2">
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-400">&bull;</span>
+              <span>Full-stack reactive Quick Commerce storefront (React + Tailwind).</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-400">&bull;</span>
+              <span>Asynchronous 10-minute order fulfillment engine in Spring Boot 3.</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-400">&bull;</span>
+              <span>Zero-code-change database portability (H2 &rarr; Amazon RDS).</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-400">&bull;</span>
+              <span>AWS S3 Object Storage integration via AWS SDK v2.</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-400">&bull;</span>
+              <span>100% Free Tier compliant with zero infrastructure cost.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="bg-brand-card border border-brand-border p-6 rounded-2xl space-y-3">
+          <h4 class="font-bold text-sky-400 text-sm flex items-center gap-2">
+            <span>🚀</span> Future Production Enhancements
+          </h4>
+          <ul class="text-xs text-slate-300 space-y-2">
+            <li class="flex items-center gap-2">
+              <span class="text-sky-400">&bull;</span>
+              <span><strong>Amazon SQS:</strong> Decouple order checkout queue for spike smoothing.</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-sky-400">&bull;</span>
+              <span><strong>Amazon DynamoDB:</strong> Ultra-fast NoSQL storage for live delivery rider GPS coordinates.</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-sky-400">&bull;</span>
+              <span><strong>AWS Auto Scaling &amp; ALB:</strong> Automatic EC2 scale-out during dark store rush hours.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="mt-8 text-center bg-gradient-to-r from-brand-yellow/10 via-emerald-500/10 to-brand-accent/10 border border-brand-border p-6 rounded-2xl">
+        <h3 class="text-xl font-black text-white">Thank You!</h3>
+        <p class="text-xs text-slate-400 mt-1">Questions &amp; Live Demonstration</p>
+        <div class="mt-3 inline-flex items-center gap-2 text-xs font-mono text-brand-yellow">
+          <span>GitHub:</span>
+          <a href="https://github.com/ArnavAstu/MinutDel" target="_blank" class="underline text-white hover:text-brand-yellow">
+            https://github.com/ArnavAstu/MinutDel
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Navigation Controls -->
+  <footer class="nav-controls w-full border-t border-brand-border bg-brand-dark/90 backdrop-blur-md py-4 px-6 sticky bottom-0 z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <button id="prevBtn" onclick="prevSlide()" class="px-4 py-2 rounded-xl bg-brand-card hover:bg-slate-800 text-slate-200 border border-brand-border text-xs font-bold transition flex items-center gap-1 cursor-pointer">
+          &larr; Previous
+        </button>
+        <button id="nextBtn" onclick="nextSlide()" class="px-5 py-2 rounded-xl bg-brand-green hover:bg-brand-darkgreen text-white text-xs font-bold shadow-md shadow-brand-green/20 transition flex items-center gap-1 cursor-pointer">
+          Next &rarr;
+        </button>
+      </div>
+
+      <div class="hidden sm:flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+        <span>Use <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">&larr;</kbd> <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">&rarr;</kbd> arrow keys to navigate</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="window.print()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition border border-slate-700 flex items-center gap-1 cursor-pointer" title="Save as PDF or Print">
+          📄 Print / PDF
+        </button>
+        <button onclick="toggleFullScreen()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition border border-slate-700 cursor-pointer" title="Toggle Fullscreen">
+          ⛶ Fullscreen
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 10;
+
+    function showSlide(index) {
+      if (index < 1) index = 1;
+      if (index > totalSlides) index = totalSlides;
+      currentSlide = index;
+
+      document.querySelectorAll('.slide').forEach((slide) => {
+        slide.classList.remove('active');
+        if (parseInt(slide.getAttribute('data-slide')) === currentSlide) {
+          slide.classList.add('active');
+        }
+      });
+
+      document.getElementById('slideCounter').textContent = `Slide ${currentSlide} / ${totalSlides}`;
+      document.getElementById('progressBar').style.width = `${(currentSlide / totalSlides) * 100}%`;
+
+      document.getElementById('prevBtn').disabled = currentSlide === 1;
+      document.getElementById('prevBtn').classList.toggle('opacity-50', currentSlide === 1);
+      document.getElementById('nextBtn').textContent = currentSlide === totalSlides ? 'Finish 🏁' : 'Next →';
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        showSlide(currentSlide + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        showSlide(currentSlide - 1);
+      }
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+
+    showSlide(1);
+  </script>
+</body>
+</html>
