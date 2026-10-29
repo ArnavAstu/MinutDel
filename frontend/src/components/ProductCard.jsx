@@ -1,7 +1,13 @@
 import React from 'react';
 import { Plus, Minus, Zap, Star } from 'lucide-react';
+import { soundService } from '../services/soundService';
 
 export default function ProductCard({ product, quantityInCart, onAddToCart, onRemoveFromCart }) {
+  const handleAdd = () => {
+    soundService.playAddToCart();
+    onAddToCart(product);
+  };
+
   return (
     <div className="bg-white rounded-2xl border border-slate-200/80 p-3 hover:shadow-lg transition-all duration-200 flex flex-col justify-between group">
       
@@ -75,7 +81,7 @@ export default function ProductCard({ product, quantityInCart, onAddToCart, onRe
                 {quantityInCart}
               </span>
               <button
-                onClick={() => onAddToCart(product)}
+                onClick={handleAdd}
                 className="w-5 h-5 flex items-center justify-center hover:bg-black/20 rounded transition"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -84,7 +90,7 @@ export default function ProductCard({ product, quantityInCart, onAddToCart, onRe
           ) : (
             /* "+ ADD" Button */
             <button
-              onClick={() => onAddToCart(product)}
+              onClick={handleAdd}
               className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-brand-green/30 bg-emerald-50 hover:bg-brand-green hover:text-white text-brand-green font-bold text-xs transition duration-150 active:scale-95 shadow-xs"
             >
               <Plus className="w-3.5 h-3.5" />

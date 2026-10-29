@@ -2,10 +2,19 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from './components/Navbar';
 import CategoryFilter from './components/CategoryFilter';
 import ProductCard from './components/ProductCard';
+import QuickBundles from './components/QuickBundles';
 import CartDrawer from './components/CartDrawer';
 import OrderTrackerModal from './components/OrderTrackerModal';
 import CloudStatusModal from './components/CloudStatusModal';
-import { Sparkles, Zap, PackageCheck } from 'lucide-react';
+import StressTestModal from './components/StressTestModal';
+import { Sparkles, Zap, PackageCheck, Flame } from 'lucide-react';
+import { soundService } from './services/soundService';
+
+const DARK_STORES = [
+  { id: 'ds1', name: 'Sector 62, Noida', hubCode: 'Hub #07', distance: '0.8 km', eta: '9 mins' },
+  { id: 'ds2', name: 'Indirapuram, Ghaziabad', hubCode: 'Hub #12', distance: '1.8 km', eta: '12 mins' },
+  { id: 'ds3', name: 'Cyber Hub, Gurgaon', hubCode: 'Hub #04', distance: '3.2 km', eta: '18 mins' },
+];
 
 export default function App() {
   const [categories, setCategories] = useState([]);
@@ -16,9 +25,14 @@ export default function App() {
   const [activeOrder, setActiveOrder] = useState(null);
   const [cloudInfo, setCloudInfo] = useState(null);
 
+  // New Unique Feature States
+  const [selectedStore, setSelectedStore] = useState(DARK_STORES[0]);
+  const [weatherMode, setWeatherMode] = useState('clear'); // 'clear' | 'rain' | 'rush'
+
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isOrderTrackerOpen, setIsOrderTrackerOpen] = useState(false);
   const [isCloudInfoOpen, setIsCloudInfoOpen] = useState(false);
+  const [isStressTestOpen, setIsStressTestOpen] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
@@ -94,6 +108,22 @@ export default function App() {
     });
   };
 
+  // 1-Click Recipe Kit Bundle handler
+  const handleAddBundle = (bundleItems) => {
+    soundService.playAddToCart();
+    setCart((prev) => {
+      const next = { ...prev };
+      bundleItems.forEach((product) => {
+        const currentQty = next[product.id]?.quantity || 0;
+        next[product.id] = {
+          product,
+          quantity: currentQty + 1,
+        };
+      });
+      return next;
+    });
+  };
+
   const cartCount = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = Object.values(cart).reduce(
     (sum, item) => sum + item.product.price * item.quantity,
@@ -107,7 +137,10 @@ export default function App() {
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderPayload),
+        body: JSON.stringify({
+          ...orderPayload,
+          deliveryAddress: `${orderPayload.deliveryAddress} (Dispatched via ${selectedStore.name} • ${selectedStore.hubCode})`
+        }),
       });
 
       if (!res.ok) {
@@ -160,7 +193,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-['Inter',sans-serif]">
       
-      {/* Top Navbar */}
+      {/* Top Navbar with Dark Store Switcher & Weather Surge */}
       <Navbar
         cartCount={cartCount}
         cartTotal={cartTotal}
@@ -168,7 +201,12 @@ export default function App() {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         onOpenCloudInfo={() => setIsCloudInfoOpen(true)}
-        cloudInfo={cloudInfo}
+        onOpenStressTest={() => setIsStressTestOpen(true)}
+        selectedStore={selectedStore}
+        setSelectedStore={setSelectedStore}
+        weatherMode={weatherMode}
+        setWeatherMode={setWeatherMode}
+        darkStores={DARK_STORES}
       />
 
       {/* Category Pills Slider */}
@@ -180,34 +218,50 @@ export default function App() {
 
       {/* Hero Quick Delivery Banner */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 w-full">
-        <div className="bg-gradient-to-r from-brand-yellow via-amber-300 to-yellow-400 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm border border-amber-300/50">
+        <div className="bg-gradient-to-r from-brand-yellow via-amber-300 to-yellow-400 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs border border-amber-300/50">
           <div className="space-y-2 text-center md:text-left">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900 text-brand-yellow text-xs font-black tracking-wide">
               <Zap className="w-3.5 h-3.5 fill-brand-yellow" />
-              <span>SUPERFAST QUICK COMMERCE</span>
+              <span>SUPERFAST QUICK COMMERCE • {selectedStore.hubCode}</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Groceries Delivered in <span className="underline decoration-slate-900">10 Minutes</span>
+              Groceries Delivered in <span className="underline decoration-slate-900">{selectedStore.eta}</span>
             </h1>
             <p className="text-xs sm:text-sm text-slate-800 font-medium max-w-md">
-              Order fresh milk, snacks, vegetables, and drinks packed right from our local dark store.
+              Fulfilling from <strong className="text-slate-950">{selectedStore.name}</strong> ({selectedStore.distance} away). Sub-100ms real-time cloud inventory locking.
             </p>
           </div>
 
-          {activeOrder && (
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            {activeOrder && (
+              <button
+                onClick={() => setIsOrderTrackerOpen(true)}
+                className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-3 rounded-2xl font-black text-xs flex items-center gap-2 shadow-lg transition active:scale-95 cursor-pointer"
+              >
+                <PackageCheck className="w-4 h-4 text-brand-yellow" />
+                <span>Track Active Order #{activeOrder.id}</span>
+              </button>
+            )}
+
             <button
-              onClick={() => setIsOrderTrackerOpen(true)}
-              className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-3 rounded-2xl font-black text-xs flex items-center gap-2 shadow-lg transition active:scale-95"
+              onClick={() => setIsStressTestOpen(true)}
+              className="bg-white/80 hover:bg-white text-slate-900 px-4 py-3 rounded-2xl font-extrabold text-xs flex items-center gap-2 border border-slate-900/10 shadow-xs transition active:scale-95 cursor-pointer"
             >
-              <PackageCheck className="w-4 h-4 text-brand-yellow" />
-              <span>Track Active Order #{activeOrder.id}</span>
+              <Flame className="w-4 h-4 text-rose-600 animate-pulse" />
+              <span>Stress Test</span>
             </button>
-          )}
+          </div>
         </div>
       </div>
 
+      {/* 1-Click Recipe Kits (Smart Bundles) */}
+      <QuickBundles
+        products={products}
+        onAddBundle={handleAddBundle}
+      />
+
       {/* Products Grid Section */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex-1 w-full">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl font-black text-slate-900">
@@ -216,7 +270,7 @@ export default function App() {
                 : categories.find((c) => c.slug === activeCategory)?.name || 'Products'}
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              {products.length} products available for instant delivery
+              {products.length} products verified in stock at {selectedStore.hubCode}
             </p>
           </div>
         </div>
@@ -259,7 +313,7 @@ export default function App() {
             MinutDel Quick Commerce Architecture Demonstration
           </p>
           <p className="text-[11px] text-slate-400">
-            Designed for Cloud Computing Project • Running on Spring Boot 3 + React + AWS Free Tier
+            Engineered with Spring Boot 3 + React 18 • Deployed on AWS Free Tier (EC2, S3, RDS)
           </p>
         </div>
       </footer>
@@ -273,6 +327,8 @@ export default function App() {
         onRemoveFromCart={removeFromCart}
         onCheckout={handleCheckout}
         isPlacingOrder={isPlacingOrder}
+        selectedStore={selectedStore}
+        weatherMode={weatherMode}
       />
 
       <OrderTrackerModal
@@ -285,6 +341,12 @@ export default function App() {
       <CloudStatusModal
         isOpen={isCloudInfoOpen}
         onClose={() => setIsCloudInfoOpen(false)}
+        cloudInfo={cloudInfo}
+      />
+
+      <StressTestModal
+        isOpen={isStressTestOpen}
+        onClose={() => setIsStressTestOpen(false)}
         cloudInfo={cloudInfo}
       />
 

@@ -12,10 +12,20 @@ public class CloudStatusResponse {
     private String hostName;
     private String serverTime;
     private String cloudTierInfo;
+    
+    // Cloud JVM & Health Telemetry
+    private long totalMemoryMb;
+    private long freeMemoryMb;
+    private long usedMemoryMb;
+    private int availableProcessors;
+    private int activeThreads;
 
     public CloudStatusResponse() {}
 
-    public CloudStatusResponse(String appName, String environment, String databaseType, boolean awsS3Enabled, String s3Bucket, String hostName, String cloudTierInfo) {
+    public CloudStatusResponse(String appName, String environment, String databaseType, boolean awsS3Enabled,
+                               String s3Bucket, String hostName, String cloudTierInfo,
+                               long totalMemoryMb, long freeMemoryMb, long usedMemoryMb,
+                               int availableProcessors, int activeThreads) {
         this.appName = appName;
         this.environment = environment;
         this.databaseType = databaseType;
@@ -24,69 +34,24 @@ public class CloudStatusResponse {
         this.hostName = hostName;
         this.serverTime = LocalDateTime.now().toString();
         this.cloudTierInfo = cloudTierInfo;
+        this.totalMemoryMb = totalMemoryMb;
+        this.freeMemoryMb = freeMemoryMb;
+        this.usedMemoryMb = usedMemoryMb;
+        this.availableProcessors = availableProcessors;
+        this.activeThreads = activeThreads;
     }
 
-    public String getAppName() {
-        return appName;
-    }
-
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
-
-    public String getEnvironment() {
-        return environment;
-    }
-
-    public void setEnvironment(String environment) {
-        this.environment = environment;
-    }
-
-    public String getDatabaseType() {
-        return databaseType;
-    }
-
-    public void setDatabaseType(String databaseType) {
-        this.databaseType = databaseType;
-    }
-
-    public boolean isAwsS3Enabled() {
-        return awsS3Enabled;
-    }
-
-    public void setAwsS3Enabled(boolean awsS3Enabled) {
-        this.awsS3Enabled = awsS3Enabled;
-    }
-
-    public String getS3Bucket() {
-        return s3Bucket;
-    }
-
-    public void setS3Bucket(String s3Bucket) {
-        this.s3Bucket = s3Bucket;
-    }
-
-    public String getHostName() {
-        return hostName;
-    }
-
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
-    }
-
-    public String getServerTime() {
-        return serverTime;
-    }
-
-    public void setServerTime(String serverTime) {
-        this.serverTime = serverTime;
-    }
-
-    public String getCloudTierInfo() {
-        return cloudTierInfo;
-    }
-
-    public void setCloudTierInfo(String cloudTierInfo) {
-        this.cloudTierInfo = cloudTierInfo;
-    }
+    public String getAppName() { return appName; }
+    public String getEnvironment() { return environment; }
+    public String getDatabaseType() { return databaseType; }
+    public boolean isAwsS3Enabled() { return awsS3Enabled; }
+    public String getS3Bucket() { return s3Bucket; }
+    public String getHostName() { return hostName; }
+    public String getServerTime() { return serverTime; }
+    public String getCloudTierInfo() { return cloudTierInfo; }
+    public long getTotalMemoryMb() { return totalMemoryMb; }
+    public long getFreeMemoryMb() { return freeMemoryMb; }
+    public long getUsedMemoryMb() { return usedMemoryMb; }
+    public int getAvailableProcessors() { return availableProcessors; }
+    public int getActiveThreads() { return activeThreads; }
 }

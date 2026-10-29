@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X, Plus, Minus, ArrowRight, ShieldCheck, Clock, ShoppingCart } from 'lucide-react';
+import { X, Plus, Minus, ArrowRight, ShieldCheck, Clock, ShoppingCart, CloudRain, MapPin } from 'lucide-react';
+import { soundService } from '../services/soundService';
 
 export default function CartDrawer({
   isOpen,
@@ -8,7 +9,9 @@ export default function CartDrawer({
   onAddToCart,
   onRemoveFromCart,
   onCheckout,
-  isPlacingOrder
+  isPlacingOrder,
+  selectedStore,
+  weatherMode
 }) {
   const [customerName, setCustomerName] = useState('Rahul Sharma');
   const [customerEmail, setCustomerEmail] = useState('rahul.sharma@example.com');
@@ -20,11 +23,14 @@ export default function CartDrawer({
   const itemsTotal = Object.values(cart).reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
   const deliveryFee = 0; // Free 10-min delivery promo
   const handlingFee = 2.0;
-  const grandTotal = itemsTotal > 0 ? itemsTotal + deliveryFee + handlingFee : 0;
+  const rainSurgeFee = weatherMode === 'rain' ? 15.0 : 0.0;
+  const grandTotal = itemsTotal > 0 ? itemsTotal + deliveryFee + handlingFee + rainSurgeFee : 0;
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (Object.keys(cart).length === 0) return;
+
+    soundService.playOrderPlaced();
 
     onCheckout({
       customerName,
@@ -66,10 +72,15 @@ export default function CartDrawer({
           </button>
         </div>
 
-        {/* 10-Min Flash Banner */}
-        <div className="bg-emerald-50 border-b border-emerald-100 px-4 py-2 flex items-center gap-2 text-xs text-brand-green font-bold">
-          <Clock className="w-4 h-4" />
-          <span>Delivery in 10 minutes from Dark Store #07</span>
+        {/* 10-Min Flash Banner with selected dark store */}
+        <div className="bg-emerald-50 border-b border-emerald-100 px-4 py-2 flex items-center justify-between text-xs text-brand-green font-bold">
+          <div className="flex items-center gap-1.5">
+            <Clock className="w-4 h-4 shrink-0" />
+            <span>Delivery in {selectedStore?.eta || '10 mins'}</span>
+          </div>
+          <span className="text-[10px] text-slate-500 font-normal">
+            {selectedStore?.hubCode || 'Hub #07'}
+          </span>
         </div>
 
         {/* Content */}
@@ -81,7 +92,7 @@ export default function CartDrawer({
               </div>
               <h3 className="font-bold text-slate-700">Your cart is empty</h3>
               <p className="text-xs text-slate-400 max-w-xs mx-auto">
-                Explore our catalog to add fresh groceries, snacks, and dairy in 10 minutes!
+                Explore our catalog or 1-Click Recipe Kits to add fresh items instantly!
               </p>
             </div>
           ) : (
@@ -112,7 +123,10 @@ export default function CartDrawer({
                       </button>
                       <span className="text-xs font-bold min-w-[12px] text-center">{quantity}</span>
                       <button
-                        onClick={() => onAddToCart(product)}
+                        onClick={() => {
+                          soundService.playAddToCart();
+                          onAddToCart(product);
+                        }}
                         className="w-4 h-4 flex items-center justify-center hover:bg-black/20 rounded"
                       >
                         <Plus className="w-3 h-3" />
@@ -124,8 +138,9 @@ export default function CartDrawer({
 
               {/* Delivery Details Form */}
               <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200/70 space-y-2.5">
-                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  Delivery Details
+                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-brand-green" />
+                  <span>Delivery Address</span>
                 </h4>
                 <div className="space-y-2">
                   <input
@@ -178,6 +193,15 @@ export default function CartDrawer({
                   <span>Handling Fee</span>
                   <span>₹{handlingFee.toFixed(2)}</span>
                 </div>
+                {weatherMode === 'rain' && (
+                  <div className="flex justify-between text-sky-700 font-semibold">
+                    <span className="flex items-center gap-1">
+                      <CloudRain className="w-3.5 h-3.5" />
+                      <span>Rider Rain Protection Fee</span>
+                    </span>
+                    <span>₹{rainSurgeFee.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="pt-2 border-t border-slate-200 flex justify-between font-black text-sm text-slate-900">
                   <span>To Pay</span>
                   <span>₹{grandTotal.toFixed(2)}</span>
@@ -205,7 +229,7 @@ export default function CartDrawer({
                 <span className="text-[10px] text-emerald-200 uppercase font-semibold">TOTAL</span>
               </div>
               <div className="flex items-center gap-1.5 text-sm">
-                <span>{isPlacingOrder ? 'Processing...' : 'Place 10-Min Order'}</span>
+                <span>{isPlacingOrder ? 'Processing...' : `Place ${selectedStore?.eta || '10-Min'} Order`}</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
             </button>

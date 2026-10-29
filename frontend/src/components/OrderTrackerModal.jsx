@@ -1,5 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X, CheckCircle2, Clock, Bike, PackageCheck, AlertCircle, PhoneCall, Sparkles } from 'lucide-react';
+import RiderMapRadar from './RiderMapRadar';
+import { soundService } from '../services/soundService';
 
 export default function OrderTrackerModal({
   order,
@@ -9,9 +11,18 @@ export default function OrderTrackerModal({
 }) {
   if (!order) return null;
 
+  const hasPlayedDeliveredSound = useRef(false);
+
   // Poll for updates every 2.5s while order is not completed or cancelled
   useEffect(() => {
-    if (order.status === 'DELIVERED' || order.status === 'CANCELLED') return;
+    if (order.status === 'DELIVERED') {
+      if (!hasPlayedDeliveredSound.current) {
+        soundService.playDelivered();
+        hasPlayedDeliveredSound.current = true;
+      }
+      return;
+    }
+    if (order.status === 'CANCELLED') return;
 
     const interval = setInterval(() => {
       onRefreshOrder(order.id);
@@ -22,10 +33,10 @@ export default function OrderTrackerModal({
 
   const stages = [
     { key: 'PLACED', label: 'Order Received', desc: 'Dark Store confirmed items' },
-    { key: 'PACKING', label: 'Packing Items', desc: 'Picker assembling groceries' },
-    { key: 'RIDER_ASSIGNED', label: 'Rider Assigned', desc: 'Partner waiting at store' },
-    { key: 'OUT_FOR_DELIVERY', label: 'Out for Delivery', desc: 'On the way to your door' },
-    { key: 'DELIVERED', label: 'Delivered', desc: 'Arrived at your doorstep' },
+    { key: 'PACKING', label: 'Packing Items', desc: 'Picker assembling groceries in Aisle 4' },
+    { key: 'RIDER_ASSIGNED', label: 'Rider Assigned', desc: 'Partner waiting at store bay' },
+    { key: 'OUT_FOR_DELIVERY', label: 'Out for Delivery', desc: 'EV Scooter speeding on main road' },
+    { key: 'DELIVERED', label: 'Delivered', desc: 'Arrived at your doorstep in 10 mins!' },
   ];
 
   const getStageIndex = (status) => {
@@ -46,10 +57,10 @@ export default function OrderTrackerModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-xs" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-xs" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200">
         
         {/* Header Banner */}
         <div className={`p-6 text-white ${
@@ -81,14 +92,14 @@ export default function OrderTrackerModal({
                   : `Arriving in ~${order.estimatedMinutesRemaining || 10} Mins`}
               </h2>
               <p className="text-xs text-white/80 mt-1">
-                {order.darkStoreLocation || 'Dark Store #07'}
+                {order.darkStoreLocation || 'Dark Store #07 - Sector 62'}
               </p>
             </div>
 
             {!isCancelled && !isDelivered && (
               <div className="flex items-center gap-1.5 bg-brand-yellow text-slate-900 font-extrabold text-xs px-3 py-1.5 rounded-xl animate-pulse">
                 <Bike className="w-4 h-4" />
-                <span>LIVE TRACKING</span>
+                <span>LIVE RADAR</span>
               </div>
             )}
 
@@ -104,9 +115,18 @@ export default function OrderTrackerModal({
         {/* Scrollable Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
 
+          {/* Embedded Real-Time GPS Radar & Map (Shows only when active) */}
+          {!isCancelled && (
+            <RiderMapRadar
+              status={order.status}
+              darkStoreLocation={order.darkStoreLocation}
+              deliveryAddress={order.deliveryAddress}
+            />
+          )}
+
           {/* Stepper Progress */}
           {!isCancelled ? (
-            <div className="relative pl-6 space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+            <div className="relative pl-6 space-y-5 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
               {stages.map((stage, idx) => {
                 const isPassed = currentStageIndex > idx;
                 const isCurrent = currentStageIndex === idx;
@@ -160,7 +180,7 @@ export default function OrderTrackerModal({
             </div>
           )}
 
-          {/* Rider Card (Appears once rider is assigned) */}
+          {/* Rider Card */}
           {order.riderName && !isCancelled && (
             <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -169,7 +189,7 @@ export default function OrderTrackerModal({
                 </div>
                 <div>
                   <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">
-                    Delivery Partner
+                    Delivery Partner • Ather EV
                   </span>
                   <h4 className="text-xs font-extrabold text-slate-900">{order.riderName}</h4>
                   <span className="text-xs text-slate-500">{order.riderPhone}</span>

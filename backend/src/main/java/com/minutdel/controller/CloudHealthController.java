@@ -39,9 +39,16 @@ public class CloudHealthController {
             hostName = InetAddress.getLocalHost().getHostName();
         } catch (Exception ignored) {}
 
-        String database = isAws ? "Amazon RDS (PostgreSQL db.t3.micro)" : "H2 Embedded In-Memory SQL";
-        String environment = isAws ? "AWS Cloud (EC2 t2.micro)" : "Local Development Environment";
+        String database = isAws ? "Amazon RDS (PostgreSQL db.t3.micro)" : "H2 Embedded In-Memory SQL (ACID Compliant)";
+        String environment = isAws ? "AWS Cloud (EC2 t2.micro/t3.micro)" : "Local Development Environment";
         String cloudTier = "AWS Free Tier Architecture (Compute: EC2, Storage: S3, DB: RDS)";
+
+        Runtime runtime = Runtime.getRuntime();
+        long totalMemoryMb = runtime.totalMemory() / (1024 * 1024);
+        long freeMemoryMb = runtime.freeMemory() / (1024 * 1024);
+        long usedMemoryMb = totalMemoryMb - freeMemoryMb;
+        int processors = runtime.availableProcessors();
+        int activeThreads = Thread.activeCount();
 
         CloudStatusResponse response = new CloudStatusResponse(
                 appName,
@@ -50,7 +57,12 @@ public class CloudHealthController {
                 awsS3Service.isS3Enabled(),
                 awsS3Service.getBucketName(),
                 hostName,
-                cloudTier
+                cloudTier,
+                totalMemoryMb,
+                freeMemoryMb,
+                usedMemoryMb,
+                processors,
+                activeThreads
         );
 
         return ResponseEntity.ok(response);
