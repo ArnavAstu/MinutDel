@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, Plus, Minus, ArrowRight, ShieldCheck, Clock, ShoppingCart, CloudRain, MapPin, Mail, Phone, User, FileText } from 'lucide-react';
+import { X, Plus, Minus, ArrowRight, ShieldCheck, Clock, ShoppingCart, CloudRain, MapPin, Mail, Phone, User, FileText, Banknote, CreditCard, CheckCircle2 } from 'lucide-react';
 import { soundService } from '../services/soundService';
+import PaymentModal from './PaymentModal';
 
 export default function CartDrawer({
   isOpen,
@@ -17,6 +18,8 @@ export default function CartDrawer({
   const [customerEmail, setCustomerEmail] = useState('rahul.sharma@example.com');
   const [deliveryAddress, setDeliveryAddress] = useState('Tower 4, Flat 502, Express Greens, Sector 62, Noida');
   const [contactNumber, setContactNumber] = useState('+91 98765-43210');
+  const [paymentMethodChoice, setPaymentMethodChoice] = useState('COD'); // 'COD' | 'ONLINE'
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   if (!isOpen) return null;
 
@@ -35,6 +38,13 @@ export default function CartDrawer({
       return;
     }
 
+    if (paymentMethodChoice === 'ONLINE') {
+      // Trigger Mock Payment Gateway Modal
+      setIsPaymentModalOpen(true);
+      return;
+    }
+
+    // Cash on Delivery Selected
     soundService.playOrderPlaced();
 
     onCheckout({
@@ -43,6 +53,28 @@ export default function CartDrawer({
       deliveryAddress: deliveryAddress.trim(),
       contactNumber: contactNumber.trim(),
       darkStoreLocation: `${selectedStore?.name || 'Sector 62 Hub'} (${selectedStore?.hubCode || 'Hub #07'})`,
+      paymentMethod: 'CASH_ON_DELIVERY',
+      paymentStatus: 'PENDING_COD',
+      transactionId: 'COD-DOORSTEP',
+      items: Object.values(cart).map((item) => ({
+        productId: item.product.id,
+        quantity: item.quantity
+      }))
+    });
+  };
+
+  const handleOnlinePaymentSuccess = (paymentData) => {
+    soundService.playOrderPlaced();
+
+    onCheckout({
+      customerName: customerName.trim(),
+      customerEmail: customerEmail.trim(),
+      deliveryAddress: deliveryAddress.trim(),
+      contactNumber: contactNumber.trim(),
+      darkStoreLocation: `${selectedStore?.name || 'Sector 62 Hub'} (${selectedStore?.hubCode || 'Hub #07'})`,
+      paymentMethod: paymentData.paymentMethod || 'ONLINE_MOCK_UPI',
+      paymentStatus: 'PAID',
+      transactionId: paymentData.transactionId,
       items: Object.values(cart).map((item) => ({
         productId: item.product.id,
         quantity: item.quantity
@@ -229,6 +261,75 @@ export default function CartDrawer({
                 </div>
               </div>
 
+              {/* Payment Method Selector (COD vs Mock Online Gateway) */}
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                    <Banknote className="w-4 h-4 text-brand-green" />
+                    <span>Payment Method</span>
+                  </h4>
+                  <span className="text-[10px] text-slate-400 font-semibold">Select to Confirm</span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-2 pt-0.5">
+                  {/* COD Option */}
+                  <div
+                    onClick={() => setPaymentMethodChoice('COD')}
+                    className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition ${
+                      paymentMethodChoice === 'COD'
+                        ? 'border-brand-green bg-emerald-50/50 shadow-xs ring-1 ring-brand-green'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-base">
+                        💵
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                          <span>Cash on Delivery (COD)</span>
+                          <span className="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded font-bold">Doorstep</span>
+                        </div>
+                        <p className="text-[10px] text-slate-500">Pay cash or UPI to rider when delivery arrives</p>
+                      </div>
+                    </div>
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                      paymentMethodChoice === 'COD' ? 'border-brand-green bg-brand-green' : 'border-slate-300'
+                    }`}>
+                      {paymentMethodChoice === 'COD' && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                    </div>
+                  </div>
+
+                  {/* Mock Online Gateway Option */}
+                  <div
+                    onClick={() => setPaymentMethodChoice('ONLINE')}
+                    className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition ${
+                      paymentMethodChoice === 'ONLINE'
+                        ? 'border-brand-green bg-emerald-50/50 shadow-xs ring-1 ring-brand-green'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-sky-100 text-sky-800 flex items-center justify-center font-bold text-base">
+                        ⚡
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                          <span>Mock Online Gateway</span>
+                          <span className="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded font-bold">Instant</span>
+                        </div>
+                        <p className="text-[10px] text-slate-500">Simulate UPI (GPay/PhonePe), Card, or Netbanking</p>
+                      </div>
+                    </div>
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                      paymentMethodChoice === 'ONLINE' ? 'border-brand-green bg-brand-green' : 'border-slate-300'
+                    }`}>
+                      {paymentMethodChoice === 'ONLINE' && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Bill Summary */}
               <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200/70 space-y-1.5 text-xs">
                 <h4 className="font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center justify-between">
@@ -282,15 +383,33 @@ export default function CartDrawer({
             >
               <div className="text-left text-xs">
                 <div>₹{grandTotal.toFixed(2)}</div>
-                <span className="text-[10px] text-emerald-200 uppercase font-semibold">TOTAL</span>
+                <span className="text-[10px] text-emerald-200 uppercase font-semibold">
+                  {paymentMethodChoice === 'COD' ? 'COD TOTAL' : 'ONLINE TOTAL'}
+                </span>
               </div>
               <div className="flex items-center gap-1.5 text-sm">
-                <span>{isPlacingOrder ? 'Processing...' : `Place ${selectedStore?.eta || '10-Min'} Order & Send Bill`}</span>
+                <span>
+                  {isPlacingOrder
+                    ? 'Processing...'
+                    : paymentMethodChoice === 'COD'
+                    ? 'Place Order (Cash on Delivery)'
+                    : 'Proceed to Mock Pay & Place Order'}
+                </span>
                 <ArrowRight className="w-4 h-4" />
               </div>
             </button>
           </div>
         )}
+
+        {/* Mock Payment Gateway Modal */}
+        <PaymentModal
+          isOpen={isPaymentModalOpen}
+          onClose={() => setIsPaymentModalOpen(false)}
+          amount={grandTotal}
+          customerName={customerName}
+          customerEmail={customerEmail}
+          onPaymentSuccess={handleOnlinePaymentSuccess}
+        />
 
       </div>
     </div>

@@ -33,6 +33,14 @@ public class Order {
     @Column(nullable = false)
     private OrderStatus status = OrderStatus.PLACED;
 
+    @Column(nullable = false)
+    private String paymentMethod = "CASH_ON_DELIVERY";
+
+    @Column(nullable = false)
+    private String paymentStatus = "PENDING_COD";
+
+    private String transactionId;
+
     private String riderName;
     private String riderPhone;
     private Integer estimatedMinutesRemaining = 10;
@@ -114,6 +122,30 @@ public class Order {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
     }
 
     public String getRiderName() {

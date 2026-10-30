@@ -48,6 +48,25 @@ public class OrderService {
                 : "DarkStore #07 - Sector 62 Hub";
         order.setDarkStoreLocation(darkStore);
 
+        // Validate and configure Payment Gateway / Cash on Delivery
+        String paymentMethod = (request.getPaymentMethod() != null && !request.getPaymentMethod().isBlank())
+                ? request.getPaymentMethod().trim().toUpperCase()
+                : "CASH_ON_DELIVERY";
+
+        if (paymentMethod.contains("ONLINE") || paymentMethod.contains("UPI") || paymentMethod.contains("CARD") || paymentMethod.contains("NETBANKING")) {
+            if (!"PAID".equalsIgnoreCase(request.getPaymentStatus()) || request.getTransactionId() == null || request.getTransactionId().isBlank()) {
+                throw new IllegalStateException("Payment verification failed: Online orders require successful authorization through the Mock Payment Gateway.");
+            }
+            order.setPaymentMethod(paymentMethod);
+            order.setPaymentStatus("PAID");
+            order.setTransactionId(request.getTransactionId().trim());
+        } else {
+            // Cash on Delivery (COD)
+            order.setPaymentMethod("CASH_ON_DELIVERY");
+            order.setPaymentStatus("PENDING_COD");
+            order.setTransactionId("COD-DOORSTEP");
+        }
+
         BigDecimal total = BigDecimal.ZERO;
 
         for (OrderItemRequest itemReq : request.getItems()) {

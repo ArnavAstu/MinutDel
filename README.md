@@ -35,7 +35,13 @@ flowchart TD
    - Includes fallback simulation mode locally with instant browser preview at `GET /api/orders/{id}/invoice`.
    - **AWS Free Tier compliance:** 62,000 outbound emails/month free when triggered from an EC2 instance.
 
-2. **10-Minute Real-Time Order Tracking & SSE:**
+2. **Mock Payment Gateway & Cash on Delivery (COD):**
+   - **Cash on Delivery (COD):** Direct checkout with `PENDING_COD` status; customer pays rider at doorstep.
+   - **Mock Online Payment Gateway (UPI / Card / NetBanking):** Razorpay / Stripe style modal with simulated UPI QR code, test card auto-fill, netbanking, and 3-step banking authorization.
+   - **Guaranteed Order Confirmation Policy:** Orders are rejected with 400 Bad Request unless either online payment is successfully authorized or Cash on Delivery is selected.
+   - Transaction reference IDs (`TXN_MOCK_xxxx` or `COD-DOORSTEP`) are tracked in the database and printed on the AWS SES tax invoice.
+
+3. **10-Minute Real-Time Order Tracking & SSE:**
    - Asynchronous fulfillment engine transitions states:
      - `PLACED` → `PACKING` (picker Rajesh at Dark Store #07) → `RIDER_ASSIGNED` (partner Amit Sharma • +91 98711-22334) → `OUT_FOR_DELIVERY` → `DELIVERED`.
    - Supports real-time Server-Sent Events (SSE) at `/api/orders/{id}/stream` and periodic polling with a simulated GPS Rider Radar map.

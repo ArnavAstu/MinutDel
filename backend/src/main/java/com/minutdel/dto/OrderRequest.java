@@ -21,6 +21,10 @@ public class OrderRequest {
     private String contactNumber;
     private String darkStoreLocation;
 
+    private String paymentMethod = "CASH_ON_DELIVERY"; // CASH_ON_DELIVERY or ONLINE_MOCK_UPI / CARD / NETBANKING
+    private String paymentStatus = "PENDING_COD";      // PENDING_COD or PAID
+    private String transactionId;                      // e.g. TXN_MOCK_XXXXXX for online mock gateway
+
     @NotEmpty(message = "Cart cannot be empty")
     @Valid
     private List<OrderItemRequest> items;
@@ -65,6 +69,30 @@ public class OrderRequest {
 
     public void setDarkStoreLocation(String darkStoreLocation) {
         this.darkStoreLocation = darkStoreLocation;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
     }
 
     public List<OrderItemRequest> getItems() {

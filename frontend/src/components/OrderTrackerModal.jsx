@@ -305,7 +305,24 @@ export default function OrderTrackerModal({
                 <ExternalLink className="w-3 h-3 text-sky-400" />
               </a>
             </div>
-            <div className="text-[11px] text-slate-600 flex flex-wrap gap-x-4 gap-y-1 pt-1 border-t border-sky-200/60 font-medium">
+
+            {/* Payment & Billing Status */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-sky-200/60">
+              {currentOrder.paymentStatus === 'PAID' ? (
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-lg border border-emerald-200">
+                  <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                  <span>Paid Online ({currentOrder.paymentMethod || 'UPI'})</span>
+                  <span className="font-mono text-[10px] text-emerald-950 font-normal">[{currentOrder.transactionId}]</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold bg-amber-100 text-amber-900 px-2.5 py-1 rounded-lg border border-amber-200">
+                  <span>💵 Cash on Delivery</span>
+                  <span className="font-bold text-[10px] text-amber-950">(Pay ₹{currentOrder.totalAmount?.toFixed(2)} to rider)</span>
+                </span>
+              )}
+            </div>
+
+            <div className="text-[11px] text-slate-600 flex flex-wrap gap-x-4 gap-y-1 pt-1 font-medium">
               <span>Billed to: <strong>{currentOrder.customerName}</strong></span>
               <span>Contact: <strong>{currentOrder.contactNumber}</strong></span>
               <span>Delivery Hub: <strong>{currentOrder.darkStoreLocation || 'Hub #07'}</strong></span>

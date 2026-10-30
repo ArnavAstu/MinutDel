@@ -184,6 +184,12 @@ public class AwsEmailService {
                 + "      <tr><td style='padding: 4px 0; color: #64748b;'>Contact Number:</td><td style='padding: 4px 0; font-weight: 600; color: #0f172a;'>" + (order.getContactNumber() != null ? order.getContactNumber() : "N/A") + "</td></tr>"
                 + "      <tr><td style='padding: 4px 0; color: #64748b;'>Delivery Address:</td><td style='padding: 4px 0; font-weight: 600; color: #0f172a;'>" + (order.getDeliveryAddress() != null ? order.getDeliveryAddress() : "N/A") + "</td></tr>"
                 + "      <tr><td style='padding: 4px 0; color: #64748b;'>Dark Store Hub:</td><td style='padding: 4px 0; font-weight: 600; color: #0c831f;'>" + (order.getDarkStoreLocation() != null ? order.getDarkStoreLocation() : "Hub #07") + "</td></tr>"
+                + "      <tr><td style='padding: 4px 0; color: #64748b;'>Payment Mode:</td><td style='padding: 4px 0; font-weight: 700; color: #0f172a;'>"
+                + ("PAID".equalsIgnoreCase(order.getPaymentStatus())
+                        ? "<span style='background:#dcfce7; color:#166534; padding:2px 8px; border-radius:6px; font-size:11px;'>💳 ONLINE PAID (" + (order.getPaymentMethod() != null ? order.getPaymentMethod() : "ONLINE") + ")</span>"
+                        : "<span style='background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:6px; font-size:11px;'>💵 CASH ON DELIVERY (PENDING)</span>")
+                + "</td></tr>"
+                + "      <tr><td style='padding: 4px 0; color: #64748b;'>Transaction Ref:</td><td style='padding: 4px 0; font-family: monospace; font-size: 12px; color: #475569;'>" + (order.getTransactionId() != null ? order.getTransactionId() : "COD-DOORSTEP") + "</td></tr>"
                 + "      <tr><td style='padding: 4px 0; color: #64748b;'>Order Date & Time:</td><td style='padding: 4px 0; color: #334155;'>" + formattedDate + "</td></tr>"
                 + "    </table>"
                 + "  </div>"
@@ -211,7 +217,9 @@ public class AwsEmailService {
                 + "      <tr><td style='padding: 4px 0; color: #64748b;'>Items Subtotal:</td><td style='padding: 4px 0; text-align: right; font-weight: 600;'>₹" + itemsTotal.setScale(2) + "</td></tr>"
                 + "      <tr><td style='padding: 4px 0; color: #64748b;'>Delivery Charge:</td><td style='padding: 4px 0; text-align: right; color: #0c831f; font-weight: 700;'><span style='text-decoration: line-through; color: #94a3b8; font-size: 11px; margin-right: 4px;'>₹15.00</span>FREE</td></tr>"
                 + "      <tr><td style='padding: 4px 0; color: #64748b;'>Handling Fee:</td><td style='padding: 4px 0; text-align: right; font-weight: 600;'>₹" + handlingFee.setScale(2) + "</td></tr>"
-                + "      <tr style='border-top: 2px solid #cbd5e1;'><td style='padding: 8px 0 0; font-size: 15px; font-weight: 900; color: #0f172a;'>Total Paid:</td><td style='padding: 8px 0 0; text-align: right; font-size: 16px; font-weight: 900; color: #0c831f;'>₹" + finalTotal.setScale(2) + "</td></tr>"
+                + ("PAID".equalsIgnoreCase(order.getPaymentStatus())
+                        ? "<tr style='border-top: 2px solid #cbd5e1;'><td style='padding: 8px 0 0; font-size: 14px; font-weight: 900; color: #0f172a;'>Total Paid (Online):</td><td style='padding: 8px 0 0; text-align: right; font-size: 16px; font-weight: 900; color: #0c831f;'>₹" + finalTotal.setScale(2) + "</td></tr>"
+                        : "<tr style='border-top: 2px solid #cbd5e1;'><td style='padding: 8px 0 0; font-size: 14px; font-weight: 900; color: #0f172a;'>Total Due (COD):</td><td style='padding: 8px 0 0; text-align: right; font-size: 16px; font-weight: 900; color: #d97706;'>₹" + finalTotal.setScale(2) + "</td></tr>")
                 + "    </table>"
                 + "  </div>"
 
@@ -237,7 +245,9 @@ public class AwsEmailService {
         sb.append("Email: ").append(order.getCustomerEmail()).append("\n");
         sb.append("Phone: ").append(order.getContactNumber()).append("\n");
         sb.append("Delivery Address: ").append(order.getDeliveryAddress()).append("\n");
-        sb.append("Dispatched from: ").append(order.getDarkStoreLocation()).append("\n\n");
+        sb.append("Dispatched from: ").append(order.getDarkStoreLocation()).append("\n");
+        sb.append("Payment Mode: ").append(order.getPaymentMethod()).append(" [").append(order.getPaymentStatus()).append("]\n");
+        sb.append("Transaction Ref: ").append(order.getTransactionId()).append("\n\n");
         sb.append("----------------------------------------------------\n");
         sb.append("ITEMS ORDERED:\n");
 
