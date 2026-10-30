@@ -21,13 +21,16 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final OrderSimulationService orderSimulationService;
+    private final AwsEmailService awsEmailService;
 
     public OrderService(OrderRepository orderRepository,
                         ProductRepository productRepository,
-                        OrderSimulationService orderSimulationService) {
+                        OrderSimulationService orderSimulationService,
+                        AwsEmailService awsEmailService) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
         this.orderSimulationService = orderSimulationService;
+        this.awsEmailService = awsEmailService;
     }
 
     @Transactional
@@ -39,7 +42,11 @@ public class OrderService {
         order.setContactNumber(request.getContactNumber());
         order.setStatus(OrderStatus.PLACED);
         order.setEstimatedMinutesRemaining(10);
-        order.setDarkStoreLocation("DarkStore #07 - Sector 62 Hub");
+        
+        String darkStore = (request.getDarkStoreLocation() != null && !request.getDarkStoreLocation().isBlank())
+                ? request.getDarkStoreLocation()
+                : "DarkStore #07 - Sector 62 Hub";
+        order.setDarkStoreLocation(darkStore);
 
         BigDecimal total = BigDecimal.ZERO;
 
@@ -62,6 +69,9 @@ public class OrderService {
 
         order.setTotalAmount(total);
         Order savedOrder = orderRepository.save(order);
+
+        // Send official tax invoice & bill via AWS SES asynchronously
+        awsEmailService.sendOrderInvoiceEmail(savedOrder);
 
         // Kick off asynchronous delivery simulation
         orderSimulationService.simulateOrderLifecycle(savedOrder.getId());

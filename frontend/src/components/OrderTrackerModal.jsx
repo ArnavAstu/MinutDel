@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { X, CheckCircle2, Clock, Bike, PackageCheck, AlertCircle, PhoneCall, Sparkles } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { X, CheckCircle2, Clock, Bike, AlertCircle, PhoneCall, Sparkles, Radio, ShieldCheck, Mail, FileText, ExternalLink } from 'lucide-react';
 import RiderMapRadar from './RiderMapRadar';
 import { soundService } from '../services/soundService';
 
@@ -11,25 +11,68 @@ export default function OrderTrackerModal({
 }) {
   if (!order) return null;
 
+  const [currentOrder, setCurrentOrder] = useState(order);
+  const [streamActive, setStreamActive] = useState(false);
   const hasPlayedDeliveredSound = useRef(false);
 
-  // Poll for updates every 2.5s while order is not completed or cancelled
   useEffect(() => {
-    if (order.status === 'DELIVERED') {
-      if (!hasPlayedDeliveredSound.current) {
-        soundService.playDelivered();
-        hasPlayedDeliveredSound.current = true;
-      }
+    setCurrentOrder(order);
+  }, [order]);
+
+  // Server-Sent Events (SSE) Real-Time Stream Subscription
+  useEffect(() => {
+    if (!order.id || currentOrder.status === 'DELIVERED' || currentOrder.status === 'CANCELLED') {
       return;
     }
-    if (order.status === 'CANCELLED') return;
 
-    const interval = setInterval(() => {
-      onRefreshOrder(order.id);
-    }, 2500);
+    let eventSource = null;
+    let fallbackInterval = null;
 
-    return () => clearInterval(interval);
-  }, [order.id, order.status, onRefreshOrder]);
+    try {
+      eventSource = new EventSource(`/api/orders/${order.id}/stream`);
+
+      eventSource.addEventListener('order-init', (e) => {
+        try {
+          const updated = JSON.parse(e.data);
+          setCurrentOrder(updated);
+          setStreamActive(true);
+        } catch (err) {}
+      });
+
+      eventSource.addEventListener('order-update', (e) => {
+        try {
+          const updated = JSON.parse(e.data);
+          setCurrentOrder(updated);
+          setStreamActive(true);
+
+          if (updated.status === 'DELIVERED' && !hasPlayedDeliveredSound.current) {
+            soundService.playDelivered();
+            hasPlayedDeliveredSound.current = true;
+          }
+        } catch (err) {}
+      });
+
+      eventSource.onerror = () => {
+        // SSE disconnected: close and gracefully fallback to polling
+        if (eventSource) eventSource.close();
+        setStreamActive(false);
+
+        fallbackInterval = setInterval(() => {
+          onRefreshOrder(order.id);
+        }, 3000);
+      };
+    } catch (e) {
+      // Fallback to polling directly
+      fallbackInterval = setInterval(() => {
+        onRefreshOrder(order.id);
+      }, 3000);
+    }
+
+    return () => {
+      if (eventSource) eventSource.close();
+      if (fallbackInterval) clearInterval(fallbackInterval);
+    };
+  }, [order.id, currentOrder.status, onRefreshOrder]);
 
   const stages = [
     { key: 'PLACED', label: 'Order Received', desc: 'Dark Store confirmed items' },
@@ -50,9 +93,9 @@ export default function OrderTrackerModal({
     }
   };
 
-  const currentStageIndex = getStageIndex(order.status);
-  const isCancelled = order.status === 'CANCELLED';
-  const isDelivered = order.status === 'DELIVERED';
+  const currentStageIndex = getStageIndex(currentOrder.status);
+  const isCancelled = currentOrder.status === 'CANCELLED';
+  const isDelivered = currentOrder.status === 'DELIVERED';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -71,9 +114,17 @@ export default function OrderTrackerModal({
             : 'bg-slate-900'
         }`}>
           <div className="flex items-center justify-between mb-4">
-            <span className="text-xs uppercase font-extrabold tracking-wider bg-white/20 px-2.5 py-1 rounded-full">
-              Order #{order.id}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs uppercase font-extrabold tracking-wider bg-white/20 px-2.5 py-1 rounded-full">
+                Order #{currentOrder.id}
+              </span>
+              <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                streamActive ? 'bg-emerald-500/30 text-emerald-300' : 'bg-slate-800 text-slate-400'
+              }`}>
+                <Radio className="w-2.5 h-2.5 animate-pulse" />
+                <span>{streamActive ? 'SSE LIVE STREAM' : 'POLLING FALLBACK'}</span>
+              </span>
+            </div>
             <button
               onClick={onClose}
               className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
@@ -89,17 +140,17 @@ export default function OrderTrackerModal({
                   ? 'Order Cancelled'
                   : isDelivered
                   ? 'Order Delivered!'
-                  : `Arriving in ~${order.estimatedMinutesRemaining || 10} Mins`}
+                  : `Arriving in ~${currentOrder.estimatedMinutesRemaining || 10} Mins`}
               </h2>
               <p className="text-xs text-white/80 mt-1">
-                {order.darkStoreLocation || 'Dark Store #07 - Sector 62'}
+                {currentOrder.darkStoreLocation || 'Dark Store #07 - Sector 62'}
               </p>
             </div>
 
             {!isCancelled && !isDelivered && (
               <div className="flex items-center gap-1.5 bg-brand-yellow text-slate-900 font-extrabold text-xs px-3 py-1.5 rounded-xl animate-pulse">
                 <Bike className="w-4 h-4" />
-                <span>LIVE RADAR</span>
+                <span>REAL-TIME RADAR</span>
               </div>
             )}
 
@@ -115,13 +166,22 @@ export default function OrderTrackerModal({
         {/* Scrollable Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
 
-          {/* Embedded Real-Time GPS Radar & Map (Shows only when active) */}
+          {/* Embedded Real-Time GPS Radar & Map */}
           {!isCancelled && (
-            <RiderMapRadar
-              status={order.status}
-              darkStoreLocation={order.darkStoreLocation}
-              deliveryAddress={order.deliveryAddress}
-            />
+            <div>
+              <RiderMapRadar
+                status={currentOrder.status}
+                darkStoreLocation={currentOrder.darkStoreLocation}
+                deliveryAddress={currentOrder.deliveryAddress}
+              />
+              <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono mt-1 px-1">
+                <span className="flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-sky-500" />
+                  <span>Demonstration Notice: High-fidelity simulated GPS vector route</span>
+                </span>
+                <span className="text-emerald-600 font-bold">SSE Push Active</span>
+              </div>
+            </div>
           )}
 
           {/* Stepper Progress */}
@@ -181,7 +241,7 @@ export default function OrderTrackerModal({
           )}
 
           {/* Rider Card */}
-          {order.riderName && !isCancelled && (
+          {currentOrder.riderName && !isCancelled && (
             <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 bg-brand-yellow rounded-full flex items-center justify-center text-xl shadow-inner">
@@ -191,12 +251,12 @@ export default function OrderTrackerModal({
                   <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">
                     Delivery Partner • Ather EV
                   </span>
-                  <h4 className="text-xs font-extrabold text-slate-900">{order.riderName}</h4>
-                  <span className="text-xs text-slate-500">{order.riderPhone}</span>
+                  <h4 className="text-xs font-extrabold text-slate-900">{currentOrder.riderName}</h4>
+                  <span className="text-xs text-slate-500">{currentOrder.riderPhone}</span>
                 </div>
               </div>
               <a
-                href={`tel:${order.riderPhone}`}
+                href={`tel:${currentOrder.riderPhone}`}
                 className="w-9 h-9 rounded-full bg-emerald-100 hover:bg-emerald-200 flex items-center justify-center text-brand-green transition"
               >
                 <PhoneCall className="w-4 h-4" />
@@ -207,11 +267,11 @@ export default function OrderTrackerModal({
           {/* Ordered Items Summary */}
           <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 space-y-2">
             <div className="flex justify-between items-center text-xs font-bold text-slate-700">
-              <span>Items in this Order ({order.items?.length || 0})</span>
-              <span className="text-slate-900 font-black">Total: ₹{order.totalAmount?.toFixed(2)}</span>
+              <span>Items in this Order ({currentOrder.items?.length || 0})</span>
+              <span className="text-slate-900 font-black">Total: ₹{currentOrder.totalAmount?.toFixed(2)}</span>
             </div>
             <div className="divide-y divide-slate-200/60 text-xs">
-              {order.items?.map((item) => (
+              {currentOrder.items?.map((item) => (
                 <div key={item.id} className="py-2 flex justify-between items-center">
                   <span className="text-slate-700">
                     {item.product?.name} <span className="text-slate-400 font-semibold">× {item.quantity}</span>
@@ -222,19 +282,49 @@ export default function OrderTrackerModal({
             </div>
           </div>
 
+          {/* AWS SES Email Invoice Box */}
+          <div className="bg-gradient-to-r from-sky-50 to-indigo-50 border border-sky-200/80 rounded-2xl p-4 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-sky-600 text-white flex items-center justify-center text-xs shadow-sm">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900">AWS SES Order Bill Dispatched</h4>
+                  <span className="text-[10px] text-slate-500 block">Sent to: <strong className="text-sky-700">{currentOrder.customerEmail}</strong></span>
+                </div>
+              </div>
+              <a
+                href={`/api/orders/${currentOrder.id}/invoice`}
+                target="_blank"
+                rel="noreferrer"
+                className="px-3 py-1.5 bg-white hover:bg-sky-50 text-sky-700 border border-sky-300 rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-xs"
+              >
+                <FileText className="w-3.5 h-3.5" />
+                <span>View Bill</span>
+                <ExternalLink className="w-3 h-3 text-sky-400" />
+              </a>
+            </div>
+            <div className="text-[11px] text-slate-600 flex flex-wrap gap-x-4 gap-y-1 pt-1 border-t border-sky-200/60 font-medium">
+              <span>Billed to: <strong>{currentOrder.customerName}</strong></span>
+              <span>Contact: <strong>{currentOrder.contactNumber}</strong></span>
+              <span>Delivery Hub: <strong>{currentOrder.darkStoreLocation || 'Hub #07'}</strong></span>
+            </div>
+          </div>
+
           {/* Destination */}
           <div className="text-xs text-slate-500">
             <span className="font-bold text-slate-700">Delivering to: </span>
-            {order.deliveryAddress}
+            {currentOrder.deliveryAddress}
           </div>
 
         </div>
 
         {/* Footer Actions */}
         <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-3">
-          {['PLACED', 'PACKING'].includes(order.status) && (
+          {['PLACED', 'PACKING'].includes(currentOrder.status) && (
             <button
-              onClick={() => onCancelOrder(order.id)}
+              onClick={() => onCancelOrder(currentOrder.id)}
               className="text-xs text-rose-600 hover:text-rose-700 font-bold px-3 py-2 rounded-lg hover:bg-rose-50 transition"
             >
               Cancel Order

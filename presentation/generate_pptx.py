@@ -93,20 +93,21 @@ def create_presentation():
     # Hero Subtitle
     sub_box = s1.shapes.add_textbox(Inches(1.2), Inches(4.1), Inches(10.9), Inches(0.8))
     p_sub = sub_box.text_frame.paragraphs[0]
-    p_sub.text = "Full-stack event-driven grocery fulfillment engine architected with Spring Boot 3, React 18,\nand deployed on zero-cost AWS Cloud infrastructure (EC2, S3, RDS, Actuator)."
+    p_sub.text = "Full-stack event-driven grocery fulfillment engine architected with Spring Boot 3, React 18,\nand deployed on zero-cost AWS Cloud infrastructure (EC2, S3, RDS, SES, CloudWatch)."
     p_sub.font.size = Pt(14)
     p_sub.font.color.rgb = TEXT_MUTED
 
-    # 4 Quick stats pills
+    # 5 Quick stats pills
     stats = [
         ("COMPUTE", "Amazon EC2 (t2.micro)"),
         ("STORAGE", "Amazon S3 Bucket"),
         ("DATABASE", "PostgreSQL / H2 JPA"),
-        ("OBSERVABILITY", "CloudWatch / Actuator")
+        ("MESSAGING", "Amazon SES Email"),
+        ("TELEMETRY", "CloudWatch / Actuator")
     ]
     for i, (label, val) in enumerate(stats):
-        col_x = Inches(1.2 + i * 2.7)
-        card_stat = add_card(s1, col_x, Inches(5.1), Inches(2.55), Inches(0.9), fill_color=RGBColor(15, 23, 42))
+        col_x = Inches(1.2 + i * 2.18)
+        card_stat = add_card(s1, col_x, Inches(5.1), Inches(2.05), Inches(0.9), fill_color=RGBColor(15, 23, 42))
         tf = card_stat.text_frame
         p_lbl = tf.paragraphs[0]
         p_lbl.text = label
@@ -115,7 +116,7 @@ def create_presentation():
         p_lbl.font.color.rgb = ACCENT_YELLOW
         p_val = tf.add_paragraph()
         p_val.text = val
-        p_val.font.size = Pt(11)
+        p_val.font.size = Pt(10.5)
         p_val.font.bold = True
         p_val.font.color.rgb = TEXT_WHITE
 
@@ -167,9 +168,9 @@ def create_presentation():
     add_slide_header(s3, "02", "High-Level Cloud Architecture Blueprint", "Decoupled 3-Tier topology following 12-Factor Cloud Application methodology.")
 
     tiers = [
-        ("TIER 1: PRESENTATION (EDGE)", "React 18 SPA (Vite + Tailwind)", "• Client-side reactive storefront\n• 5-stage live delivery progress polling\n• Embedded Cloud Telemetry inspector\n• Bundled directly into Spring Boot static resources", ACCENT_BLUE),
+        ("TIER 1: PRESENTATION (EDGE)", "React 18 SPA (Vite + Tailwind)", "• Client-side reactive storefront\n• 5-stage live delivery progress polling\n• Embedded Cloud Telemetry inspector\n• Customer checkout details & invoice viewer", ACCENT_BLUE),
         ("TIER 2: COMPUTE (APPLICATION)", "Spring Boot 3 on AWS EC2", "• Stateless REST API on port 8080\n• Spring Data JPA abstraction layer\n• Asynchronous @Async simulation engine\n• Actuator health & telemetry endpoints", ACCENT_YELLOW),
-        ("TIER 3: PERSISTENCE & OBJECTS", "Amazon RDS + Amazon S3", "• Amazon RDS PostgreSQL (Managed DB)\n• Embedded H2 for local zero-setup dev\n• Amazon S3 bucket for grocery imagery\n• AWS SDK v2 client integration with fallback", ACCENT_GREEN)
+        ("TIER 3: PERSISTENCE & MESSAGING", "Amazon RDS + S3 + SES", "• Amazon RDS PostgreSQL (Managed DB)\n• Embedded H2 for local zero-setup dev\n• Amazon S3 bucket for grocery imagery\n• Amazon SES automated email billing engine", ACCENT_GREEN)
     ]
 
     for i, (tag, name, details, col) in enumerate(tiers):
@@ -203,23 +204,24 @@ def create_presentation():
         ("Amazon EC2", "Virtual Compute", "750 Hours / Month (t2.micro / t3.micro)", "Hosts Spring Boot container, web server, and asynchronous execution threads 24/7.", ACCENT_YELLOW),
         ("Amazon S3", "Object Storage", "5 GB Standard Storage + 20,000 GETs", "Decoupled media hosting for grocery images, served directly to browsers without touching server CPU.", ACCENT_GREEN),
         ("Amazon RDS", "Managed Relational DB", "750 Hours / Month (db.t3.micro) + 20 GB", "Managed PostgreSQL database instance providing transaction guarantees and multi-AZ backups.", ACCENT_BLUE),
-        ("Amazon CloudWatch", "Telemetry & Logs", "5 GB Ingestion + Basic Alarms", "Centralized aggregation of Spring Boot Actuator health metrics, API latency, and application logs.", ACCENT_YELLOW)
+        ("Amazon SES", "Transactional Email Service", "62,000 Emails / Month (From EC2)", "Automatically delivers responsive HTML tax bills with itemized products, address, and pricing to customer email.", ACCENT_YELLOW),
+        ("Amazon CloudWatch", "Telemetry & Logs", "5 GB Ingestion + Basic Alarms", "Centralized aggregation of Spring Boot Actuator health metrics, API latency, and application logs.", ACCENT_GREEN)
     ]
 
     for i, (srv, role, free_allowance, explanation, color) in enumerate(services):
-        y = Inches(2.3 + i * 1.15)
-        card = add_card(s4, Inches(0.8), y, Inches(11.733), Inches(1.0))
+        y = Inches(2.2 + i * 0.95)
+        card = add_card(s4, Inches(0.8), y, Inches(11.733), Inches(0.85))
         tf = card.text_frame
         
         p = tf.paragraphs[0]
         p.text = f"{srv}  •  {role}"
-        p.font.size = Pt(14)
+        p.font.size = Pt(13)
         p.font.bold = True
         p.font.color.rgb = color
         
         p2 = tf.add_paragraph()
         p2.text = f"Free Tier Limit: {free_allowance}  |  Role: {explanation}"
-        p2.font.size = Pt(11)
+        p2.font.size = Pt(10.5)
         p2.font.color.rgb = TEXT_MUTED
 
     # ==========================================
@@ -294,9 +296,9 @@ def create_presentation():
     add_slide_header(s7, "06", "React Storefront & Live Cloud Telemetry", "Modern Blinkit-style user interface integrated with live cloud inspection capabilities.")
 
     fe_cards = [
-        ("🛒 Instant Cart Drawer", "• Persistent client-side cart state\n• Real-time +/- quantity steppers\n• Automatic bill calculation (MRP, handling fees, free 10-min delivery promo)\n• Customer delivery address input", ACCENT_YELLOW),
-        ("🚴 Live Order Tracker", "• 5-stage animated progress bar\n• Automated background polling of /api/orders/{id} every 2.5 seconds\n• Live countdown timer (10 mins -> 0 mins)\n• Delivery partner name & contact badge", ACCENT_GREEN),
-        ("☁️ Cloud Telemetry Modal", "• Live inspector querying /api/cloud-info\n• Displays active EC2 Hostname\n• Verifies active Database dialect\n• Displays Amazon S3 bucket connectivity\n• Proves AWS Free Tier compliance live", ACCENT_BLUE)
+        ("🛒 Instant Cart & Billing", "• Persistent client-side cart state\n• Real-time +/- quantity steppers\n• Customer Name, Email, Address & Phone inputs\n• Dispatches AWS SES itemized tax invoice", ACCENT_YELLOW),
+        ("🚴 Live Order & Bill View", "• 5-stage animated delivery progress bar\n• Automated background polling of /api/orders/{id}\n• Live countdown timer (10 mins -> 0 mins)\n• One-click view of AWS SES HTML tax bill", ACCENT_GREEN),
+        ("☁️ Cloud Telemetry Modal", "• Live inspector querying /api/cloud-info\n• Displays EC2 Host, RDS DB, S3 Storage\n• Displays Amazon SES delivery state & sender\n• Proves AWS Free Tier compliance live", ACCENT_BLUE)
     ]
 
     for i, (title, desc, col) in enumerate(fe_cards):
@@ -384,8 +386,8 @@ def create_presentation():
     p_c1_t.font.bold = True
     p_c1_t.font.color.rgb = ACCENT_GREEN
     p_c1_d = tf_c1.add_paragraph()
-    p_c1_d.text = "\n• Fully functional 10-minute Quick Commerce simulated platform\n• Asynchronous state machine mimicking dark-store fulfillment\n• Dual-profile database agility (H2 locally, RDS on AWS)\n• AWS SDK v2 Object Storage (S3) integration\n• 100% Free Tier compliant with zero operational costs"
-    p_c1_d.font.size = Pt(11.5)
+    p_c1_d.text = "\n• Fully functional 10-minute Quick Commerce simulated platform\n• Asynchronous state machine mimicking dark-store fulfillment\n• Dual-profile database agility (H2 locally, RDS on AWS)\n• AWS SDK v2 Object Storage (S3) integration\n• Automated Amazon SES customer billing with HTML invoice\n• 100% Free Tier compliant with zero operational costs"
+    p_c1_d.font.size = Pt(11)
     p_c1_d.font.color.rgb = TEXT_MUTED
 
     card_c2 = add_card(s10, Inches(6.8), Inches(2.3), Inches(5.7), Inches(3.5))

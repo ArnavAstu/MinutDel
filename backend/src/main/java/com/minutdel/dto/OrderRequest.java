@@ -19,6 +19,7 @@ public class OrderRequest {
     private String deliveryAddress;
 
     private String contactNumber;
+    private String darkStoreLocation;
 
     @NotEmpty(message = "Cart cannot be empty")
     @Valid
@@ -56,6 +57,14 @@ public class OrderRequest {
 
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
+    }
+
+    public String getDarkStoreLocation() {
+        return darkStoreLocation;
+    }
+
+    public void setDarkStoreLocation(String darkStoreLocation) {
+        this.darkStoreLocation = darkStoreLocation;
     }
 
     public List<OrderItemRequest> getItems() {

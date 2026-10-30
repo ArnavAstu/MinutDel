@@ -73,6 +73,12 @@
             <artifactId>s3</artifactId>
         </dependency>
 
+        <!-- AWS SDK for SES (Simple Email Service) -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>ses</artifactId>
+        </dependency>
+
         <!-- Spring Boot Actuator for Cloud Monitoring & Health checks -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

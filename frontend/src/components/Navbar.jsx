@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Search, MapPin, Zap, Cloud, Volume2, VolumeX, Flame, CloudRain, Sun, ChevronDown } from 'lucide-react';
+import { ShoppingBag, Search, MapPin, Zap, Cloud, Volume2, VolumeX, Flame, CloudRain, Sun, ChevronDown, Sparkles, BarChart3 } from 'lucide-react';
 import { soundService } from '../services/soundService';
 
 export default function Navbar({
@@ -10,6 +10,8 @@ export default function Navbar({
   setSearchQuery,
   onOpenCloudInfo,
   onOpenStressTest,
+  onOpenAiAssistant,
+  onOpenAdmin,
   selectedStore,
   setSelectedStore,
   weatherMode,
@@ -65,7 +67,7 @@ export default function Navbar({
             <div className="relative hidden md:block pl-3 border-l border-slate-200">
               <button
                 onClick={() => setIsStoreDropdownOpen(!isStoreDropdownOpen)}
-                className="flex items-center gap-2 text-left hover:bg-slate-50 p-1.5 rounded-xl transition"
+                className="flex items-center gap-2 text-left hover:bg-slate-50 p-1.5 rounded-xl transition cursor-pointer"
               >
                 <MapPin className="w-5 h-5 text-brand-green shrink-0 animate-bounce" />
                 <div>
@@ -94,7 +96,7 @@ export default function Navbar({
                         setSelectedStore(store);
                         setIsStoreDropdownOpen(false);
                       }}
-                      className={`w-full text-left p-2.5 rounded-xl text-xs flex items-start justify-between transition ${
+                      className={`w-full text-left p-2.5 rounded-xl text-xs flex items-start justify-between transition cursor-pointer ${
                         selectedStore.id === store.id ? 'bg-emerald-50 text-brand-green font-bold' : 'hover:bg-slate-50 text-slate-700'
                       }`}
                     >
@@ -113,7 +115,7 @@ export default function Navbar({
           </div>
 
           {/* Search Bar */}
-          <div className="flex-1 max-w-lg">
+          <div className="flex-1 max-w-md">
             <div className="relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
@@ -126,9 +128,29 @@ export default function Navbar({
             </div>
           </div>
 
-          {/* Right Action Icons: Weather Toggle, Stress Test, Audio, Cloud, Cart */}
+          {/* Right Action Icons: AI Assistant, Admin, Weather Toggle, Stress Test, Audio, Cloud, Cart */}
           <div className="flex items-center gap-2 shrink-0">
             
+            {/* AI Meal Assistant Button */}
+            <button
+              onClick={onOpenAiAssistant}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition border border-indigo-200 cursor-pointer shadow-xs"
+              title="Ask AI Meal & Recipe Assistant"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600 fill-indigo-500" />
+              <span className="hidden sm:inline">AI Meal Assistant</span>
+            </button>
+
+            {/* Admin Analytics Button */}
+            <button
+              onClick={onOpenAdmin}
+              className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition border border-slate-200 cursor-pointer"
+              title="Open Dark Store Admin Dashboard"
+            >
+              <BarChart3 className="w-3.5 h-3.5 text-slate-600" />
+              <span>Admin</span>
+            </button>
+
             {/* Weather / Surge Mode Cycle */}
             <button
               onClick={() => {
@@ -136,7 +158,7 @@ export default function Navbar({
                 else if (weatherMode === 'rain') setWeatherMode('rush');
                 else setWeatherMode('clear');
               }}
-              className="p-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 transition border border-slate-200"
+              className="p-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 transition border border-slate-200 cursor-pointer"
               title="Toggle Weather / Demand Simulation"
             >
               {weatherMode === 'clear' && <Sun className="w-4 h-4 text-amber-500" />}
@@ -147,7 +169,7 @@ export default function Navbar({
             {/* Sound Toggle */}
             <button
               onClick={toggleSound}
-              className="p-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 transition border border-slate-200"
+              className="p-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 transition border border-slate-200 cursor-pointer"
               title={isMuted ? 'Unmute Audio FX' : 'Mute Audio FX'}
             >
               {isMuted ? <VolumeX className="w-4 h-4 text-slate-400" /> : <Volume2 className="w-4 h-4 text-brand-green" />}
@@ -156,7 +178,7 @@ export default function Navbar({
             {/* Cloud Chaos / Stress Test Button */}
             <button
               onClick={onOpenStressTest}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 transition border border-rose-200"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 transition border border-rose-200 cursor-pointer"
               title="Run Cloud Concurrency Stress Test"
             >
               <Flame className="w-4 h-4 text-rose-600 animate-pulse" />
@@ -166,18 +188,18 @@ export default function Navbar({
             {/* Cloud Info Button */}
             <button
               onClick={onOpenCloudInfo}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition border border-slate-200"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition border border-slate-200 cursor-pointer"
               title="Inspect AWS Architecture"
             >
               <Cloud className="w-4 h-4 text-sky-600" />
-              <span className="hidden lg:inline">Cloud Status</span>
+              <span className="hidden xl:inline">Cloud Status</span>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             </button>
 
             {/* Cart Button */}
             <button
               onClick={onOpenCart}
-              className="relative flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-brand-green hover:bg-brand-darkgreen text-white font-bold shadow-md shadow-brand-green/20 transition active:scale-95"
+              className="relative flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-brand-green hover:bg-brand-darkgreen text-white font-bold shadow-md shadow-brand-green/20 transition active:scale-95 cursor-pointer"
             >
               <ShoppingBag className="w-5 h-5" />
               <div className="text-left text-xs leading-tight">

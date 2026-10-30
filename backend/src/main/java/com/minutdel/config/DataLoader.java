@@ -2,9 +2,13 @@ package com.minutdel.config;
 
 import com.minutdel.model.Category;
 import com.minutdel.model.Product;
+import com.minutdel.model.User;
 import com.minutdel.repository.CategoryRepository;
 import com.minutdel.repository.ProductRepository;
+import com.minutdel.repository.UserRepository;
+import com.minutdel.service.AwsEmailService;
 import com.minutdel.service.AwsS3Service;
+import com.minutdel.service.SecurityTokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -21,18 +25,40 @@ public class DataLoader implements CommandLineRunner {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final AwsS3Service awsS3Service;
+    private final AwsEmailService awsEmailService;
+    private final UserRepository userRepository;
+    private final SecurityTokenService securityTokenService;
 
     public DataLoader(CategoryRepository categoryRepository,
                       ProductRepository productRepository,
-                      AwsS3Service awsS3Service) {
+                      AwsS3Service awsS3Service,
+                      AwsEmailService awsEmailService,
+                      UserRepository userRepository,
+                      SecurityTokenService securityTokenService) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
         this.awsS3Service = awsS3Service;
+        this.awsEmailService = awsEmailService;
+        this.userRepository = userRepository;
+        this.securityTokenService = securityTokenService;
     }
 
     @Override
     public void run(String... args) {
         awsS3Service.initializeClient();
+        awsEmailService.initializeClient();
+
+        // Seed users if not present
+        if (userRepository.count() == 0) {
+            String adminPass = securityTokenService.hashPassword("admin123");
+            User admin = new User("admin@minutdel.com", adminPass, "Store Administrator", "+91 99999-00000", "ROLE_ADMIN");
+
+            String customerPass = securityTokenService.hashPassword("customer123");
+            User customer = new User("customer@minutdel.com", customerPass, "Rahul Sharma", "+91 98765-43210", "ROLE_CUSTOMER");
+
+            userRepository.saveAll(List.of(admin, customer));
+            log.info("Seeded default users: admin@minutdel.com and customer@minutdel.com");
+        }
 
         if (categoryRepository.count() > 0) {
             log.info("Catalog database already initialized.");

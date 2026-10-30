@@ -20,13 +20,15 @@ public class CloudHealthController {
 
     private final Environment env;
     private final AwsS3Service awsS3Service;
+    private final com.minutdel.service.AwsEmailService awsEmailService;
 
     @Value("${spring.application.name:MinutDel}")
     private String appName;
 
-    public CloudHealthController(Environment env, AwsS3Service awsS3Service) {
+    public CloudHealthController(Environment env, AwsS3Service awsS3Service, com.minutdel.service.AwsEmailService awsEmailService) {
         this.env = env;
         this.awsS3Service = awsS3Service;
+        this.awsEmailService = awsEmailService;
     }
 
     @GetMapping("/cloud-info")
@@ -41,7 +43,7 @@ public class CloudHealthController {
 
         String database = isAws ? "Amazon RDS (PostgreSQL db.t3.micro)" : "H2 Embedded In-Memory SQL (ACID Compliant)";
         String environment = isAws ? "AWS Cloud (EC2 t2.micro/t3.micro)" : "Local Development Environment";
-        String cloudTier = "AWS Free Tier Architecture (Compute: EC2, Storage: S3, DB: RDS)";
+        String cloudTier = "AWS Free Tier Architecture (Compute: EC2, Storage: S3, Email: SES, DB: RDS)";
 
         Runtime runtime = Runtime.getRuntime();
         long totalMemoryMb = runtime.totalMemory() / (1024 * 1024);
@@ -56,6 +58,8 @@ public class CloudHealthController {
                 database,
                 awsS3Service.isS3Enabled(),
                 awsS3Service.getBucketName(),
+                awsEmailService.isSesEnabled(),
+                awsEmailService.getFromEmail(),
                 hostName,
                 cloudTier,
                 totalMemoryMb,

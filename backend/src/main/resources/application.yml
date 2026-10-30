@@ -36,6 +36,11 @@ aws:
     access-key: ""
     secret-key: ""
     enabled: false  # Set to true when deploying with AWS S3 credentials
+  ses:
+    from-email: "orders@minutdel.com"
+    access-key: ""
+    secret-key: ""
+    enabled: false  # Set to true when deploying with AWS SES credentials
 
 # Actuator & Observability for Cloud Metrics
 management:

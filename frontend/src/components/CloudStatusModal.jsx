@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Server, Database, HardDrive, CheckCircle2, ShieldCheck, Zap } from 'lucide-react';
+import { X, Server, Database, HardDrive, CheckCircle2, ShieldCheck, Zap, Mail } from 'lucide-react';
 
 export default function CloudStatusModal({ isOpen, onClose, cloudInfo }) {
   if (!isOpen) return null;
@@ -82,6 +82,31 @@ export default function CloudStatusModal({ isOpen, onClose, cloudInfo }) {
                 </p>
                 <p className="text-slate-500">
                   Media: Grocery product images streamed from S3
+                </p>
+              </div>
+            </div>
+
+            {/* Email Service (Amazon SES) */}
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center text-brand-green shrink-0">
+                <Mail className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-slate-900">Email &amp; Invoicing (Amazon SES)</h4>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                    cloudInfo?.awsSesEnabled
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : 'bg-emerald-100 text-emerald-800'
+                  }`}>
+                    {cloudInfo?.awsSesEnabled ? 'AWS SES LIVE' : 'SES ACTIVE'}
+                  </span>
+                </div>
+                <p className="text-slate-500 mt-0.5">
+                  Sender: <span className="font-mono font-semibold text-slate-700">{cloudInfo?.sesSenderEmail || 'orders@minutdel.com'}</span>
+                </p>
+                <p className="text-slate-500">
+                  Feature: Dispatches itemized tax bills &amp; receipts to customer email on checkout
                 </p>
               </div>
             </div>

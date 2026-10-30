@@ -22,3 +22,8 @@ aws:
     access-key: ${AWS_ACCESS_KEY_ID:}
     secret-key: ${AWS_SECRET_ACCESS_KEY:}
     enabled: true
+  ses:
+    from-email: ${AWS_SES_FROM_EMAIL:orders@minutdel.com}
+    access-key: ${AWS_ACCESS_KEY_ID:}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:}
+    enabled: ${AWS_SES_ENABLED:true}

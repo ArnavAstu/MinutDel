@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Plus, Minus, ArrowRight, ShieldCheck, Clock, ShoppingCart, CloudRain, MapPin } from 'lucide-react';
+import { X, Plus, Minus, ArrowRight, ShieldCheck, Clock, ShoppingCart, CloudRain, MapPin, Mail, Phone, User, FileText } from 'lucide-react';
 import { soundService } from '../services/soundService';
 
 export default function CartDrawer({
@@ -30,13 +30,19 @@ export default function CartDrawer({
     e.preventDefault();
     if (Object.keys(cart).length === 0) return;
 
+    if (!customerName.trim() || !customerEmail.trim() || !deliveryAddress.trim() || !contactNumber.trim()) {
+      alert("Please fill in recipient name, email, delivery address, and contact number.");
+      return;
+    }
+
     soundService.playOrderPlaced();
 
     onCheckout({
-      customerName,
-      customerEmail,
-      deliveryAddress,
-      contactNumber,
+      customerName: customerName.trim(),
+      customerEmail: customerEmail.trim(),
+      deliveryAddress: deliveryAddress.trim(),
+      contactNumber: contactNumber.trim(),
+      darkStoreLocation: `${selectedStore?.name || 'Sector 62 Hub'} (${selectedStore?.hubCode || 'Hub #07'})`,
       items: Object.values(cart).map((item) => ({
         productId: item.product.id,
         quantity: item.quantity
@@ -129,7 +135,7 @@ export default function CartDrawer({
                         }}
                         className="w-4 h-4 flex items-center justify-center hover:bg-black/20 rounded"
                       >
-                        <Plus className="w-3 h-3" />
+                        <Plus className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
@@ -137,47 +143,97 @@ export default function CartDrawer({
               </div>
 
               {/* Delivery Details Form */}
-              <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200/70 space-y-2.5">
-                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-brand-green" />
-                  <span>Delivery Address</span>
-                </h4>
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    placeholder="Recipient Name"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    className="w-full text-xs p-2 rounded-lg border border-slate-200 bg-white outline-none focus:border-brand-green"
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email Address"
-                    value={customerEmail}
-                    onChange={(e) => setCustomerEmail(e.target.value)}
-                    className="w-full text-xs p-2 rounded-lg border border-slate-200 bg-white outline-none focus:border-brand-green"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Delivery Address"
-                    value={deliveryAddress}
-                    onChange={(e) => setDeliveryAddress(e.target.value)}
-                    className="w-full text-xs p-2 rounded-lg border border-slate-200 bg-white outline-none focus:border-brand-green"
-                  />
-                  <input
-                    type="tel"
-                    placeholder="Contact Number"
-                    value={contactNumber}
-                    onChange={(e) => setContactNumber(e.target.value)}
-                    className="w-full text-xs p-2 rounded-lg border border-slate-200 bg-white outline-none focus:border-brand-green"
-                  />
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                    <MapPin className="w-4 h-4 text-brand-green" />
+                    <span>Customer &amp; Delivery Details</span>
+                  </h4>
+                  <span className="text-[10px] bg-sky-100 text-sky-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Mail className="w-3 h-3" />
+                    <span>AWS SES Bill</span>
+                  </span>
+                </div>
+
+                <div className="space-y-2.5">
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                      Full Name <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <User className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        placeholder="e.g. Rahul Sharma"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        required
+                        className="w-full text-xs pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/20"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                      Email Address (Invoice &amp; Bill sent here) <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="email"
+                        placeholder="e.g. rahul.sharma@gmail.com"
+                        value={customerEmail}
+                        onChange={(e) => setCustomerEmail(e.target.value)}
+                        required
+                        className="w-full text-xs pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/20"
+                      />
+                    </div>
+                    <p className="text-[10px] text-slate-500 mt-1 flex items-center gap-1">
+                      <span className="text-emerald-600 font-bold">✓</span> AWS Simple Email Service (SES) will dispatch your itemized tax bill here.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                      Delivery Address <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <MapPin className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3" />
+                      <textarea
+                        rows={2}
+                        placeholder="e.g. Flat 502, Tower 4, Express Greens, Sector 62, Noida"
+                        value={deliveryAddress}
+                        onChange={(e) => setDeliveryAddress(e.target.value)}
+                        required
+                        className="w-full text-xs pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-white outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 resize-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                      Phone Number (for Rider Contact) <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="tel"
+                        placeholder="e.g. +91 98765-43210"
+                        value={contactNumber}
+                        onChange={(e) => setContactNumber(e.target.value)}
+                        required
+                        className="w-full text-xs pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white outline-none focus:border-brand-green focus:ring-2 focus:ring-brand-green/20"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Bill Summary */}
               <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200/70 space-y-1.5 text-xs">
-                <h4 className="font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  Bill Summary
+                <h4 className="font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center justify-between">
+                  <span>Bill Summary</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Official Tax Invoice</span>
                 </h4>
                 <div className="flex justify-between text-slate-600">
                   <span>Item Total</span>
@@ -210,7 +266,7 @@ export default function CartDrawer({
 
               <div className="flex items-center gap-2 text-[11px] text-slate-500 justify-center">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Simulated Order • Real-time Cloud Pipeline</span>
+                <span>Simulated Order • Real-time AWS SES Billing Pipeline</span>
               </div>
             </>
           )}
@@ -229,7 +285,7 @@ export default function CartDrawer({
                 <span className="text-[10px] text-emerald-200 uppercase font-semibold">TOTAL</span>
               </div>
               <div className="flex items-center gap-1.5 text-sm">
-                <span>{isPlacingOrder ? 'Processing...' : `Place ${selectedStore?.eta || '10-Min'} Order`}</span>
+                <span>{isPlacingOrder ? 'Processing...' : `Place ${selectedStore?.eta || '10-Min'} Order & Send Bill`}</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
             </button>

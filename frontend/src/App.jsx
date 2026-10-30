@@ -7,7 +7,9 @@ import CartDrawer from './components/CartDrawer';
 import OrderTrackerModal from './components/OrderTrackerModal';
 import CloudStatusModal from './components/CloudStatusModal';
 import StressTestModal from './components/StressTestModal';
-import { Sparkles, Zap, PackageCheck, Flame } from 'lucide-react';
+import AiMealAssistantModal from './components/AiMealAssistantModal';
+import AdminDashboardModal from './components/AdminDashboardModal';
+import { Sparkles, Zap, PackageCheck, Flame, BarChart3 } from 'lucide-react';
 import { soundService } from './services/soundService';
 
 const DARK_STORES = [
@@ -25,14 +27,18 @@ export default function App() {
   const [activeOrder, setActiveOrder] = useState(null);
   const [cloudInfo, setCloudInfo] = useState(null);
 
-  // New Unique Feature States
+  // Dark Store & Weather State
   const [selectedStore, setSelectedStore] = useState(DARK_STORES[0]);
   const [weatherMode, setWeatherMode] = useState('clear'); // 'clear' | 'rain' | 'rush'
 
+  // Modals
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isOrderTrackerOpen, setIsOrderTrackerOpen] = useState(false);
   const [isCloudInfoOpen, setIsCloudInfoOpen] = useState(false);
   const [isStressTestOpen, setIsStressTestOpen] = useState(false);
+  const [isAiAssistantOpen, setIsAiAssistantOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
@@ -108,12 +114,12 @@ export default function App() {
     });
   };
 
-  // 1-Click Recipe Kit Bundle handler
-  const handleAddBundle = (bundleItems) => {
+  // Add multiple items from AI Assistant or Recipe Kits
+  const handleAddMultipleToCart = (items) => {
     soundService.playAddToCart();
     setCart((prev) => {
       const next = { ...prev };
-      bundleItems.forEach((product) => {
+      items.forEach((product) => {
         const currentQty = next[product.id]?.quantity || 0;
         next[product.id] = {
           product,
@@ -130,7 +136,7 @@ export default function App() {
     0
   );
 
-  // Checkout
+  // Checkout with customer details & AWS SES notification
   const handleCheckout = async (orderPayload) => {
     setIsPlacingOrder(true);
     try {
@@ -139,7 +145,7 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...orderPayload,
-          deliveryAddress: `${orderPayload.deliveryAddress} (Dispatched via ${selectedStore.name} • ${selectedStore.hubCode})`
+          darkStoreLocation: orderPayload.darkStoreLocation || `${selectedStore.name} • ${selectedStore.hubCode}`
         }),
       });
 
@@ -202,6 +208,8 @@ export default function App() {
         setSearchQuery={setSearchQuery}
         onOpenCloudInfo={() => setIsCloudInfoOpen(true)}
         onOpenStressTest={() => setIsStressTestOpen(true)}
+        onOpenAiAssistant={() => setIsAiAssistantOpen(true)}
+        onOpenAdmin={() => setIsAdminOpen(true)}
         selectedStore={selectedStore}
         setSelectedStore={setSelectedStore}
         weatherMode={weatherMode}
@@ -228,11 +236,11 @@ export default function App() {
               Groceries Delivered in <span className="underline decoration-slate-900">{selectedStore.eta}</span>
             </h1>
             <p className="text-xs sm:text-sm text-slate-800 font-medium max-w-md">
-              Fulfilling from <strong className="text-slate-950">{selectedStore.name}</strong> ({selectedStore.distance} away). Sub-100ms real-time cloud inventory locking.
+              Fulfilling from <strong className="text-slate-950">{selectedStore.name}</strong> ({selectedStore.distance} away). Itemized tax invoice dispatched via AWS Simple Email Service (SES).
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-2.5">
             {activeOrder && (
               <button
                 onClick={() => setIsOrderTrackerOpen(true)}
@@ -244,8 +252,16 @@ export default function App() {
             )}
 
             <button
+              onClick={() => setIsAiAssistantOpen(true)}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-2xl font-extrabold text-xs flex items-center gap-2 shadow-md shadow-indigo-600/20 transition active:scale-95 cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-brand-yellow fill-brand-yellow" />
+              <span>Ask AI Meal Assistant</span>
+            </button>
+
+            <button
               onClick={() => setIsStressTestOpen(true)}
-              className="bg-white/80 hover:bg-white text-slate-900 px-4 py-3 rounded-2xl font-extrabold text-xs flex items-center gap-2 border border-slate-900/10 shadow-xs transition active:scale-95 cursor-pointer"
+              className="bg-white/90 hover:bg-white text-slate-900 px-4 py-3 rounded-2xl font-extrabold text-xs flex items-center gap-2 border border-slate-900/10 shadow-xs transition active:scale-95 cursor-pointer"
             >
               <Flame className="w-4 h-4 text-rose-600 animate-pulse" />
               <span>Stress Test</span>
@@ -257,7 +273,7 @@ export default function App() {
       {/* 1-Click Recipe Kits (Smart Bundles) */}
       <QuickBundles
         products={products}
-        onAddBundle={handleAddBundle}
+        onAddBundle={handleAddMultipleToCart}
       />
 
       {/* Products Grid Section */}
@@ -308,13 +324,32 @@ export default function App() {
 
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 space-y-1">
-          <p className="font-extrabold text-slate-700">
-            MinutDel Quick Commerce Architecture Demonstration
-          </p>
-          <p className="text-[11px] text-slate-400">
-            Engineered with Spring Boot 3 + React 18 • Deployed on AWS Free Tier (EC2, S3, RDS)
-          </p>
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="text-left">
+            <p className="font-extrabold text-slate-700">
+              MinutDel Quick Commerce Architecture Demonstration
+            </p>
+            <p className="text-[11px] text-slate-400">
+              Spring Boot 3 • React 18 • AWS Free Tier (EC2, S3, SES, RDS)
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsAdminOpen(true)}
+              className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer"
+            >
+              <BarChart3 className="w-3.5 h-3.5" />
+              <span>Admin Analytics Portal</span>
+            </button>
+            <span>&bull;</span>
+            <button
+              onClick={() => setIsCloudInfoOpen(true)}
+              className="text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer"
+            >
+              Cloud Status
+            </button>
+          </div>
         </div>
       </footer>
 
@@ -348,6 +383,17 @@ export default function App() {
         isOpen={isStressTestOpen}
         onClose={() => setIsStressTestOpen(false)}
         cloudInfo={cloudInfo}
+      />
+
+      <AiMealAssistantModal
+        isOpen={isAiAssistantOpen}
+        onClose={() => setIsAiAssistantOpen(false)}
+        onAddItemsToCart={handleAddMultipleToCart}
+      />
+
+      <AdminDashboardModal
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
       />
 
     </div>

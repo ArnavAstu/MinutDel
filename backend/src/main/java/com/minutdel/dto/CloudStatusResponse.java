@@ -9,6 +9,8 @@ public class CloudStatusResponse {
     private String databaseType;
     private boolean awsS3Enabled;
     private String s3Bucket;
+    private boolean awsSesEnabled;
+    private String sesSenderEmail;
     private String hostName;
     private String serverTime;
     private String cloudTierInfo;
@@ -23,7 +25,8 @@ public class CloudStatusResponse {
     public CloudStatusResponse() {}
 
     public CloudStatusResponse(String appName, String environment, String databaseType, boolean awsS3Enabled,
-                               String s3Bucket, String hostName, String cloudTierInfo,
+                               String s3Bucket, boolean awsSesEnabled, String sesSenderEmail,
+                               String hostName, String cloudTierInfo,
                                long totalMemoryMb, long freeMemoryMb, long usedMemoryMb,
                                int availableProcessors, int activeThreads) {
         this.appName = appName;
@@ -31,6 +34,8 @@ public class CloudStatusResponse {
         this.databaseType = databaseType;
         this.awsS3Enabled = awsS3Enabled;
         this.s3Bucket = s3Bucket;
+        this.awsSesEnabled = awsSesEnabled;
+        this.sesSenderEmail = sesSenderEmail;
         this.hostName = hostName;
         this.serverTime = LocalDateTime.now().toString();
         this.cloudTierInfo = cloudTierInfo;
@@ -46,6 +51,8 @@ public class CloudStatusResponse {
     public String getDatabaseType() { return databaseType; }
     public boolean isAwsS3Enabled() { return awsS3Enabled; }
     public String getS3Bucket() { return s3Bucket; }
+    public boolean isAwsSesEnabled() { return awsSesEnabled; }
+    public String getSesSenderEmail() { return sesSenderEmail; }
     public String getHostName() { return hostName; }
     public String getServerTime() { return serverTime; }
     public String getCloudTierInfo() { return cloudTierInfo; }

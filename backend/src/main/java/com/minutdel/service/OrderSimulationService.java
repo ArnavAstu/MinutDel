@@ -17,6 +17,7 @@ public class OrderSimulationService {
     private static final Logger log = LoggerFactory.getLogger(OrderSimulationService.class);
 
     private final OrderRepository orderRepository;
+    private final OrderStreamService orderStreamService;
     private final Random random = new Random();
 
     private final String[] RIDERS = {
@@ -26,8 +27,9 @@ public class OrderSimulationService {
             "Sandeep Yadav (+91 97180-66778)"
     };
 
-    public OrderSimulationService(OrderRepository orderRepository) {
+    public OrderSimulationService(OrderRepository orderRepository, OrderStreamService orderStreamService) {
         this.orderRepository = orderRepository;
+        this.orderStreamService = orderStreamService;
     }
 
     @Async
@@ -72,8 +74,11 @@ public class OrderSimulationService {
                 order.setEstimatedMinutesRemaining(minutesRemaining);
                 if (riderName != null) order.setRiderName(riderName);
                 if (riderPhone != null) order.setRiderPhone(riderPhone);
-                orderRepository.save(order);
+                Order saved = orderRepository.save(order);
                 log.info("[Order #{}] Status updated to: {} (ETA: {} mins)", orderId, status, minutesRemaining);
+                
+                // Push real-time event to connected SSE clients
+                orderStreamService.broadcastOrderUpdate(saved);
             }
         });
     }
